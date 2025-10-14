@@ -66,3 +66,6 @@ def project_detail(request, id):
         'nombre': project,
         'tasks': tasks
     })
+
+def signup(request):
+    render(request)
