@@ -2,6 +2,7 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponse, JsonResponse
 from .models import Project, Task
 from .forms import CreateNewTask, CreateNewProject
+from django.contrib.auth.decorators import login_required
 # Create your views here.
 
 
@@ -67,5 +68,4 @@ def project_detail(request, id):
         'tasks': tasks
     })
 
-def signup(request):
-    render(request)
+
