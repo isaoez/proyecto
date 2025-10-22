@@ -56,10 +56,8 @@ def signout(request):
     logout(request)
     return redirect('index') # Redirige al inicio después del logout
 
-# En myapp/views.py (ejemplo)
-
-
-#... (asegúrate de que el usuario esté logueado)
+# VISTA DE PUBLICACIÓN PROTEGIDA
+@login_required
 def crear_publicacion(request):
     if request.method == 'POST':
         form = PublicacionForm(request.POST)

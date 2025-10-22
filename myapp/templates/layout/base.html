@@ -20,6 +20,9 @@
 
         {% if user.is_authenticated %}
         <li>
+            <a href="{% url 'publicar' %}"><b>+ Publicar</b></a>
+        </li>
+        <li>
             <a href="{% url 'signout' %}">Logout</a>
         </li>
         {% else %}
