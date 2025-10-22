@@ -2,20 +2,15 @@
 
 {% block content %}
 <div class="card" style="padding: 20px; max-width: 400px; margin: 50px auto;">
-    <h1>Registro de Usuario</h1>
+    <h1>Iniciar Sesión</h1>
     
     <form method="POST">
         {% csrf_token %}
-        
         {{ form.as_p }}
         
         <button type="submit">
-            Crear Cuenta
+            Entrar
         </button>
     </form>
-    
-    <div style="text-align: center; margin-top: 20px;">
-        <p>¿Ya tienes cuenta? <a href="{% url 'signin' %}">Iniciar Sesión</a></p>
-    </div>
 </div>
 {% endblock %}

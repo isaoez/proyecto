@@ -3,6 +3,8 @@ from django.http import HttpResponse, JsonResponse
 from .models import Project, Task
 from .forms import CreateNewTask, CreateNewProject
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 # Create your views here.
 
 
@@ -68,4 +70,33 @@ def project_detail(request, id):
         'tasks': tasks
     })
 
+def signup(request):
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            user = form.save()
+            login(request, user)
+            return redirect('index') # Redirige al inicio después del registro
+    else:
+        form = UserCreationForm()
+    return render(request, 'signup.html', {
+        'form': form
+    })
 
+def signin(request):
+    if request.method == 'POST':
+        form = AuthenticationForm(data=request.POST)
+        if form.is_valid():
+            # Log in the user
+            user = form.get_user()
+            login(request, user)
+            return redirect('index') # Redirige al inicio después del login
+    else:
+        form = AuthenticationForm()
+    return render(request, 'signin.html', {
+        'form': form
+    })
+
+def signout(request):
+    logout(request)
+    return redirect('index') # Redirige al inicio después del logout

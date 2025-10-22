@@ -13,5 +13,7 @@ urlpatterns = [
     path('projects/<int:id>', views.project_detail, name='project_deteils'),
     path('login/', auth_views.LoginView.as_view(), name='login'),# URL para el Login
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),# URL para el Logout
-
+    path('signin/', views.signin, name='signin'),
+    path('signout/', views.signout, name='signout'),
+    path('signup/', views.signup, name='signup'),
 ]
