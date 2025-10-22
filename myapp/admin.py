@@ -1,6 +1,7 @@
 from django.contrib import admin
-from .models import Project, Task
+from .models import Categoria, Articulo, Deseo
 
-# Register your models here.
-admin.site.register(Project)
-admin.site.register(Task)
+# Registra los modelos en el panel de admin
+admin.site.register(Categoria)
+admin.site.register(Articulo)
+admin.site.register(Deseo)

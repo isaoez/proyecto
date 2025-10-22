@@ -1,10 +1,10 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponse, JsonResponse
-from .models import Project, Task
-from .forms import CreateNewTask, CreateNewProject
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from .forms import PublicacionForm
+from .models import Articulo, Deseo
 # Create your views here.
 
 
@@ -24,51 +24,6 @@ def about(request):
 
 def hello(request, username):
     return HttpResponse('<h1>Hello %s<h1>' % username)
-
-
-def projects(request):
-    # projects = list(Project.objects.values())
-    projects = Project.objects.all()
-    return render(request, 'projects/projects.html', {
-        'projects': projects
-    })
-
-
-def create_project(request):
-    if request.method == 'GET':
-        return render(request, 'projects/create_project.html', {
-            'form': CreateNewProject
-        })
-    else:
-        Project.objects.create(name=request.POST['name'])
-        return redirect('projects')
-
-
-def tasks(request):
-    tasks = Task.objects.all()
-    # task = get_object_or_404(Task, id=id)
-    return render(request, 'tasks/tasks.html', {
-        'tasks': tasks
-    })
-
-
-def create_task(request):
-    if request.method == 'GET':
-        return render(request, 'tasks/create_task.html', {
-            'form': CreateNewTask()
-        })
-    else:
-        Task.objects.create(
-            title=request.POST['title'], description=request.POST['description'], project_id=1)
-        return redirect('tasks')
-    
-def project_detail(request, id):
-    project = get_object_or_404(Project, id=id)
-    tasks = Task.objects.filter(project_id=project)
-    return render(request, 'projects/detail.html', {
-        'nombre': project,
-        'tasks': tasks
-    })
 
 def signup(request):
     if request.method == 'POST':
@@ -100,3 +55,34 @@ def signin(request):
 def signout(request):
     logout(request)
     return redirect('index') # Redirige al inicio después del logout
+
+# En myapp/views.py (ejemplo)
+
+
+#... (asegúrate de que el usuario esté logueado)
+def crear_publicacion(request):
+    if request.method == 'POST':
+        form = PublicacionForm(request.POST)
+        if form.is_valid():
+            
+            # 1. Crea el objeto Articulo
+            articulo_nuevo = Articulo.objects.create(
+                propietario=request.user,
+                titulo=form.cleaned_data['titulo'],
+                descripcion=form.cleaned_data['descripcion']
+            )
+            # 2. Asigna las categorías seleccionadas al artículo
+            articulo_nuevo.categorias.set(form.cleaned_data['categorias_ofrecidas'])
+
+            # 3. Crea el Deseo asociado
+            deseo_nuevo = Deseo.objects.create(
+                articulo_ofrecido=articulo_nuevo
+            )
+            # 4. Asigna las categorías seleccionadas al deseo
+            deseo_nuevo.categorias_buscadas.set(form.cleaned_data['categorias_buscadas'])
+            
+            return redirect('index') # O a donde quieras
+    else:
+        form = PublicacionForm()
+
+    return render(request, 'crear_publicacion.html', {'form': form})
