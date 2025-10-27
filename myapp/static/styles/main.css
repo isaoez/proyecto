@@ -1,46 +1,241 @@
-body {
-    background: #202020;
-    color: whitesmoke;
+/* --- PALETA DE COLORES (Verde y Blanco) --- */
+:root {
+    --color-bg: #F8F9FA;          /* Fondo principal (Gris muy claro) */
+    --color-navbar-bg: #FFFFFF;   /* Fondo de Navbar (Blanco) */
+    --color-card-bg: #FFFFFF;     /* Fondo de Tarjetas (Blanco) */
+    --color-text-primary: #212529; /* Texto principal (Casi negro) */
+    --color-text-secondary: #6C757D; /* Texto secundario (Gris) */
+    
+    --color-accent: #28a745;       /* Acento principal (Verde) */
+    --color-accent-hover: #218838;   /* Acento hover (Verde oscuro) */
+    --color-btn-hover: #218838;    /* Botón hover (Verde oscuro) */
+    
+    --color-input-bg: #FFFFFF;    /* Fondo de inputs */
+    --color-input-border: #CED4DA;  /* Borde de inputs */
+    --color-border-subtle: #DEE2E6; /* Borde suave para cards/navbar */
+    
+    --color-error: #721C24;         /* Texto de error (Rojo oscuro) */
+    --color-error-bg: #F8D7DA;     /* Fondo para errores (Rojo claro) */
+    --color-error-border: #F5C6CB; /* Borde para errores */
 }
 
+/* --- ESTILOS GLOBALES --- */
+body {
+    background: var(--color-bg);
+    color: var(--color-text-primary);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1, h2, h3, h4, h5 {
+    color: var(--color-text-primary);
+}
+
+p {
+    color: var(--color-text-secondary);
+    line-height: 1.6;
+}
+
+a {
+    color: var(--color-accent);
+    text-decoration: none;
+    transition: color 0.2s ease-in-out;
+}
+
+a:hover {
+    color: var(--color-accent-hover);
+}
+
+/* --- BARRA DE NAVEGACIÓN --- */
 .navbar {
-    background: #404040;
-    padding: 10px 10px;
+    background: var(--color-navbar-bg);
+    padding: 15px 30px;
+    border-bottom: 1px solid var(--color-border-subtle);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra suave */
 }
 
 .navbar ul {
     display: flex;
     justify-content: space-between;
-    
-}
-.navbar ul li {
+    align-items: center;
     list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
 .navbar ul li a {
-    color: white;
+    color: var(--color-text-primary);
     text-decoration: none;
+    font-weight: 500;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 .navbar ul li a:hover {
-    color: aquamarine;
+    background-color: var(--color-bg);
+    color: var(--color-accent-hover);
 }
 
+/* Estilo especial para el botón "Publicar" */
+.navbar ul li a b {
+    color: var(--color-accent);
+}
+
+.navbar ul li a:hover b {
+    color: var(--color-accent-hover);
+}
+
+
+/* --- CONTENEDOR PRINCIPAL --- */
 .container {
-    max-width: 1200px;
-    margin: auto;
+    max-width: 1000px;
+    margin: 30px auto;
     padding: 20px;
 }
 
+/* --- TARJETAS (Cards) --- */
 .card {
-    background: whitesmoke;
-    color: #404040;
-    padding: 5px;
-    margin-bottom: 2px;
+    background: var(--color-card-bg);
+    color: var(--color-text-secondary);
+    padding: 30px;
+    margin-bottom: 25px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border-subtle);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Sombra muy suave */
 }
 
+/* --- FORMULARIOS (Inputs, botones, labels) --- */
+
+.card form p {
+    margin-bottom: 20px;
+}
+
+.card form label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+/* Inputs de texto, email, contraseña */
+.card form input[type="text"],
+.card form input[type="password"],
+.card form input[type="email"],
+.card form textarea {
+    width: 100%;
+    padding: 12px 15px;
+    background: var(--color-input-bg);
+    border: 1px solid var(--color-input-border);
+    border-radius: 6px;
+    box-sizing: border-box; /* Importante */
+    font-size: 1em;
+    color: var(--color-text-primary);
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card form textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+/* Foco en los inputs */
+.card form input[type="text"]:focus,
+.card form input[type="password"]:focus,
+.card form input[type="email"]:focus,
+.card form textarea:focus {
+    outline: none;
+    border-color: var(--color-accent);
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.25); /* Sombra de foco verde */
+}
+
+/* Checkboxes */
+.card form input[type="checkbox"] {
+    margin-right: 10px;
+}
+
+/* Contenedor para checkboxes (para el form de publicación) */
+.card form div[id^="div_id_categorias"] ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin: 0;
+    max-height: 200px;
+    overflow-y: auto;
+    background: var(--color-input-bg);
+    border: 1px solid var(--color-input-border);
+    border-radius: 6px;
+    padding: 10px;
+}
+.card form div[id^="div_id_categorias"] li {
+    padding: 5px;
+}
+
+
+/* Textos de ayuda de Django */
+.card form .helptext {
+    font-size: 0.9em;
+    color: var(--color-text-secondary);
+    display: block;
+    margin-top: 8px;
+}
+
+/* Lista de errores del formulario */
+.card form .errorlist {
+    color: var(--color-error);
+    background: var(--color-error-bg);
+    border: 1px solid var(--color-error-border);
+    padding: 12px 15px;
+    border-radius: 6px;
+    list-style-type: none;
+    margin-bottom: 20px;
+    padding-left: 15px;
+}
+
+/* --- BOTÓN PRINCIPAL (.btn) --- */
+.btn {
+    background-color: var(--color-accent);
+    color: #FFFFFF; /* Texto blanco en el botón verde */
+    padding: 12px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1.05em;
+    font-weight: 700;
+    width: 100%;
+    margin-top: 10px;
+    transition: background-color 0.2s ease, transform 0.1s ease;
+}
+
+.btn:hover {
+    background-color: var(--color-btn-hover);
+    transform: translateY(-1px); /* Efecto sutil al pasar el ratón */
+}
+
+/* --- ENLACES PIE DE FORMULARIO --- */
+.form-footer-link {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.form-footer-link p {
+    margin: 0;
+    color: var(--color-text-secondary);
+}
+
+.form-footer-link a {
+    color: var(--color-accent);
+    font-weight: 600;
+}
+
+.form-footer-link a:hover {
+    color: var(--color-accent-hover);
+    text-decoration: underline;
+}
+
+/* --- CLASES MISCELÁNEAS (de tu CSS original) --- */
 .input {
-    background: wheat;
+    background: var(--color-input-bg);
     padding: 10px;
     text-align: center;
     display: block;
@@ -49,7 +244,7 @@ body {
 .link-button {
     background: none;
     border: none;
-    color: blue; /* O el color de tus enlaces */
+    color: var(--color-accent);
     text-decoration: underline;
     cursor: pointer;
     padding: 0;
@@ -57,5 +252,5 @@ body {
 }
 
 .link-button:hover {
-    color: darkblue; /* O el color hover de tus enlaces */
+    color: var(--color-accent-hover);
 }
