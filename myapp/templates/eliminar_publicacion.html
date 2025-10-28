@@ -1,0 +1,22 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="card" style="padding: 20px; max-width: 600px; margin: 50px auto; text-align: center;">
+    
+    <h1>¿Estás seguro?</h1>
+    <p>Estás a punto de eliminar permanentemente tu publicación:</p>
+    <h3 style="margin-bottom: 25px;">"{{ articulo.titulo }}"</h3>
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <button type="submit" class="btn" style="background-color: #dc3545; border-color: #dc3545;">
+            Sí, eliminar
+        </button>
+        <br>
+        <a href="{% url 'index' %}" style="display: inline-block; margin-top: 20px;">
+            Cancelar
+        </a>
+    </form>
+</div>
+{% endblock %}

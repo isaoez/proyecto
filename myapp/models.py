@@ -7,7 +7,12 @@ class Categoria(models.Model):
     padre = models.ForeignKey('self', null=True, blank=True, on_delete=models.CASCADE, related_name='subcategorias')
 
     def __str__(self):
-        return self.nombre
+        ruta_completa = [self.nombre]
+        k = self.padre
+        while k is not None:
+            ruta_completa.insert(0, k.nombre)
+            k = k.padre
+        return ' - '.join(ruta_completa)
 
 # El artículo que el usuario OFRECE
 class Articulo(models.Model):

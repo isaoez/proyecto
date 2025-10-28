@@ -9,9 +9,11 @@ from .models import Articulo, Deseo
 
 
 def index(request):
-    title = 'Welcome to Django Course'
+    title = 'Página Principal'
+    articulos = Articulo.objects.all() 
     return render(request, 'index.html', {
-        'title': title
+        'title': title,
+        'articulos': articulos
     })
 
 
@@ -84,3 +86,55 @@ def crear_publicacion(request):
         form = PublicacionForm()
 
     return render(request, 'crear_publicacion.html', {'form': form})
+@login_required
+def editar_publicacion(request, articulo_id):
+    articulo = get_object_or_404(Articulo, id=articulo_id)
+    deseo = articulo.deseo # Obtenemos el deseo asociado
+
+    # ¡LA SEGURIDAD! Comprueba si el usuario es el dueño
+    if articulo.propietario != request.user:
+        return HttpResponseForbidden("No tienes permiso para editar este artículo.")
+
+    if request.method == 'POST':
+        form = PublicacionForm(request.POST)
+        if form.is_valid():
+            
+            # 1. Actualiza el objeto Articulo
+            articulo.titulo = form.cleaned_data['titulo']
+            articulo.descripcion = form.cleaned_data['descripcion']
+            articulo.categorias.set(form.cleaned_data['categorias_ofrecidas'])
+            articulo.save() # Guarda los cambios del artículo
+
+            # 2. Actualiza el Deseo asociado
+            deseo.categorias_buscadas.set(form.cleaned_data['categorias_buscadas'])
+            deseo.save() # Guarda los cambios del deseo
+            
+            return redirect('index') # Redirige al inicio
+    else:
+        # GET: Muestra el formulario con los datos existentes
+        datos_iniciales = {
+            'titulo': articulo.titulo,
+            'descripcion': articulo.descripcion,
+            'categorias_ofrecidas': articulo.categorias.all(),
+            'categorias_buscadas': deseo.categorias_buscadas.all()
+        }
+        form = PublicacionForm(initial=datos_iniciales)
+
+    return render(request, 'editar_publicacion.html', {'form': form, 'articulo': articulo})
+
+
+@login_required
+def eliminar_publicacion(request, articulo_id):
+    articulo = get_object_or_404(Articulo, id=articulo_id)
+
+    # ¡LA SEGURIDAD! Comprueba si el usuario es el dueño
+    if articulo.propietario != request.user:
+        return HttpResponseForbidden("No tienes permiso para eliminar este artículo.")
+
+    if request.method == 'POST':
+        # Si el usuario confirma (envió el form POST), borra
+        articulo.delete()
+        return redirect('index')
+    
+    # GET: Muestra la página de confirmación
+    return render(request, 'eliminar_publicacion.html', {'articulo': articulo})

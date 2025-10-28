@@ -11,13 +11,13 @@ class PublicacionForm(forms.Form):
     # Trae todas las Categorías de la BD y las muestra como checkboxes
     categorias_ofrecidas = forms.ModelMultipleChoiceField(
         label='Géneros de tu artículo (Opciones)',
-        queryset=Categoria.objects.all(),
+        queryset=Categoria.objects.filter(subcategorias=None),
         widget=forms.CheckboxSelectMultiple # Esto crea los checkboxes
     )
 
     # Campos para el DESEO (Lo que buscas)
     categorias_buscadas = forms.ModelMultipleChoiceField(
         label='Géneros que buscas (Opciones)',
-        queryset=Categoria.objects.all(),
+        queryset=Categoria.objects.filter(subcategorias=None),
         widget=forms.CheckboxSelectMultiple # También como checkboxes
     )
