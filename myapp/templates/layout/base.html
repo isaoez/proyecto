@@ -11,25 +11,29 @@
 <body>
     <nav class="navbar">
     <ul>
-        <li>
-            <a href="/">Home</a>
+        <li {% if request.resolver_match.url_name == 'index' %}class="active"{% endif %}>
+            <a href="/">Inicio</a>
         </li>
-        <li>
+        
+        <li {% if request.resolver_match.url_name == 'about' %}class="active"{% endif %}>
             <a href="{% url 'about' %}">About</a>
         </li>
 
         {% if user.is_authenticated %}
-        <li>
+        
+        <li {% if request.resolver_match.url_name == 'publicar' %}class="active"{% endif %}>
             <a href="{% url 'publicar' %}"><b>+ Publicar</b></a>
         </li>
         <li>
             <a href="{% url 'signout' %}">Logout</a>
         </li>
         {% else %}
-        <li>
+        
+        <li {% if request.resolver_match.url_name == 'signup' %}class="active"{% endif %}>
             <a href="{% url 'signup' %}">Signup</a>
         </li>
-        <li>
+        
+        <li {% if request.resolver_match.url_name == 'signin' %}class="active"{% endif %}>
             <a href="{% url 'signin' %}">Login</a>
         </li>
         {% endif %}

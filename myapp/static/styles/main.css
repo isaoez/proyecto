@@ -254,3 +254,21 @@ a:hover {
 .link-button:hover {
     color: var(--color-accent-hover);
 }
+
+/* --- ¡NUEVO! ESTILO PARA EL ENLACE ACTIVO EN NAVBAR --- */
+.navbar ul li.active a {
+    background-color: var(--color-accent); /* Fondo verde */
+    color: #FFFFFF !important;             /* Texto blanco */
+    font-weight: 700;                  /* Un poco más grueso */
+}
+
+/* Opcional: Para mantener el color del icono '+' en Publicar */
+.navbar ul li.active a b {
+    color: #FFFFFF; /* Blanco, para que coincida */
+}
+
+/* Evitar que el hover cambie el estilo del activo */
+.navbar ul li.active a:hover {
+    background-color: var(--color-accent); /* Mantiene el fondo verde */
+    color: #FFFFFF !important;             /* Mantiene el texto blanco */
+}
