@@ -4,7 +4,7 @@
 <div class="card" style="padding: 20px; max-width: 600px; margin: 50px auto;">
     
     <h1>Crear Nueva Publicación</h1>
-    <p>Describe el artículo que ofreces y selecciona los géneros de artículos que te gustaría recibir a cambio.</p>
+    <p>Describe el artículo que ofreces y selecciona sus géneros.</p>
 
     <form method="POST">
         {% csrf_token %}
@@ -51,34 +51,6 @@
             {% if form.categorias_ofrecidas.errors %}<div class="errorlist">{{ form.categorias_ofrecidas.errors }}</div>{% endif %}
         </p>
 
-        <hr style="margin: 25px 0; border-color: var(--color-border-subtle);">
-
-        <p>
-            {{ form.categoria_buscada_padre.label_tag }}
-            <select name="{{ form.categoria_buscada_padre.name }}"
-                    id="{{ form.categoria_buscada_padre.id_for_label }}"
-                    hx-get="{% url 'ajax_load_subcategorias' %}"
-                    hx-target="#subcategorias_buscadas_container"
-                    hx-trigger="change"
-                    hx-include="[name='{{ form.categoria_buscada_padre.name }}'], [name='field_name_buscadas']">
-                
-                {% for value, text in form.categoria_buscada_padre.field.choices %}
-                    <option value="{{ value }}">{{ text }}</option>
-                {% endfor %}
-            </select>
-            <input type="hidden" name="field_name_buscadas" value="categorias_buscadas">
-            {% if form.categoria_buscada_padre.errors %}<div class="errorlist">{{ form.categoria_buscada_padre.errors }}</div>{% endif %}
-        </p>
-        
-        <p>
-            {{ form.categorias_buscadas.label_tag }}
-            <div id="subcategorias_buscadas_container">
-                {% include 'partials/subcategorias_checkboxes.html' with subcategorias=None field_name='categorias_buscadas' %}
-            </div>
-            {% if form.categorias_buscadas.errors %}<div class="errorlist">{{ form.categorias_buscadas.errors }}</div>{% endif %}
-        </p>
-
-        
         <button type="submit" style="margin-top: 20px;">
             Publicar Artículo
         </button>

@@ -26,6 +26,9 @@
         <li {% if request.resolver_match.url_name == 'publicar' %}class="active"{% endif %}>
             <a href="{% url 'publicar' %}"><b>+ Publicar</b></a>
         </li>
+        <li {% if request.resolver_match.url_name == 'editar_preferencias' %}class="active"{% endif %}>
+            <a href="{% url 'editar_preferencias' %}">Mis Preferencias</a>
+        </li>
         <li>
             <a href="{% url 'signout' %}">Logout</a>
         </li>

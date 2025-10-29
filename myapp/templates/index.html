@@ -21,7 +21,8 @@
             
             <div>
                 <strong>Busca:</strong>
-                {% for categoria in articulo.deseo.categorias_buscadas.all %}
+                
+                {% for categoria in articulo.propietario.deseo.categorias_buscadas.all %}
                     <span style="background: #eee; padding: 3px 8px; border-radius: 12px; font-size: 0.9em;">
                         {{ categoria }}
                     </span>
@@ -42,11 +43,8 @@
             {% endif %}
 
         </article>
-    {% empty %}
+    {% endfor %}    
+    
         <div class="card">
-            <p>Aún no hay publicaciones. ¡Sé el primero en <a href="{% url 'publicar' %}">publicar algo</a>!</p>
-        </div>
-    {% endfor %}
-</section>
-
+            <p>Aún no hay publicaciones. ¡Sé el primero en <a href="{% url 'publicar' %}">publicar algo
 {% endblock %}
