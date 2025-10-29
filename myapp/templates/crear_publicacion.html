@@ -2,17 +2,132 @@
 
 {% block content %}
 <div class="card" style="padding: 20px; max-width: 600px; margin: 50px auto;">
+    
     <h1>Crear Nueva Publicación</h1>
     <p>Describe el artículo que ofreces y selecciona los géneros de artículos que te gustaría recibir a cambio.</p>
 
     <form method="POST">
         {% csrf_token %}
         
-        {{ form.as_p }}
+        {% if form.non_field_errors %}
+            <div class="errorlist">{{ form.non_field_errors }}</div>
+        {% endif %}
+
+        <p>
+            {{ form.titulo.label_tag }}
+            {{ form.titulo }}
+            {% if form.titulo.errors %}<div class="errorlist">{{ form.titulo.errors }}</div>{% endif %}
+        </p>
+        <p>
+            {{ form.descripcion.label_tag }}
+            {{ form.descripcion }}
+            {% if form.descripcion.errors %}<div class="errorlist">{{ form.descripcion.errors }}</div>{% endif %}
+        </p>
+
+        <hr style="margin: 25px 0; border-color: var(--color-border-subtle);">
+
+        <p>
+            {{ form.categoria_padre.label_tag }}
+            <select name="{{ form.categoria_padre.name }}"
+                    id="{{ form.categoria_padre.id_for_label }}"
+                    hx-get="{% url 'ajax_load_subcategorias' %}"
+                    hx-target="#subcategorias_ofrecidas_container"
+                    hx-trigger="change"
+                    hx-include="[name='{{ form.categoria_padre.name }}'], [name='field_name_ofrecidas']">
+                
+                {% for value, text in form.categoria_padre.field.choices %}
+                    <option value="{{ value }}">{{ text }}</option>
+                {% endfor %}
+            </select>
+            <input type="hidden" name="field_name_ofrecidas" value="categorias_ofrecidas">
+            {% if form.categoria_padre.errors %}<div class="errorlist">{{ form.categoria_padre.errors }}</div>{% endif %}
+        </p>
+
+        <p>
+            {{ form.categorias_ofrecidas.label_tag }}
+            <div id="subcategorias_ofrecidas_container">
+                {% include 'partials/subcategorias_checkboxes.html' with subcategorias=None field_name='categorias_ofrecidas' %}
+            </div>
+            {% if form.categorias_ofrecidas.errors %}<div class="errorlist">{{ form.categorias_ofrecidas.errors }}</div>{% endif %}
+        </p>
+
+        <hr style="margin: 25px 0; border-color: var(--color-border-subtle);">
+
+        <p>
+            {{ form.categoria_buscada_padre.label_tag }}
+            <select name="{{ form.categoria_buscada_padre.name }}"
+                    id="{{ form.categoria_buscada_padre.id_for_label }}"
+                    hx-get="{% url 'ajax_load_subcategorias' %}"
+                    hx-target="#subcategorias_buscadas_container"
+                    hx-trigger="change"
+                    hx-include="[name='{{ form.categoria_buscada_padre.name }}'], [name='field_name_buscadas']">
+                
+                {% for value, text in form.categoria_buscada_padre.field.choices %}
+                    <option value="{{ value }}">{{ text }}</option>
+                {% endfor %}
+            </select>
+            <input type="hidden" name="field_name_buscadas" value="categorias_buscadas">
+            {% if form.categoria_buscada_padre.errors %}<div class="errorlist">{{ form.categoria_buscada_padre.errors }}</div>{% endif %}
+        </p>
+        
+        <p>
+            {{ form.categorias_buscadas.label_tag }}
+            <div id="subcategorias_buscadas_container">
+                {% include 'partials/subcategorias_checkboxes.html' with subcategorias=None field_name='categorias_buscadas' %}
+            </div>
+            {% if form.categorias_buscadas.errors %}<div class="errorlist">{{ form.categorias_buscadas.errors }}</div>{% endif %}
+        </p>
+
         
         <button type="submit" style="margin-top: 20px;">
             Publicar Artículo
         </button>
     </form>
 </div>
+
+<style>
+    form select,
+    form input[type="text"],
+    form textarea {
+        width: 100%;
+        padding: 12px 15px;
+        background: var(--color-input-bg);
+        border: 1px solid var(--color-input-border);
+        border-radius: 6px;
+        box-sizing: border-box; /* Importante */
+        font-size: 1em;
+        color: var(--color-text-primary);
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        margin-top: 5px; /* Añadido para separar label de input */
+    }
+
+    form textarea {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    form label {
+        display: block;
+        margin-bottom: 0; /* Ajustado */
+        font-weight: 600;
+        color: var(--color-text-primary);
+    }
+    
+    form p {
+        margin-bottom: 20px;
+    }
+
+    form .errorlist {
+        color: var(--color-error);
+        background: var(--color-error-bg);
+        border: 1px solid var(--color-error-border);
+        padding: 10px 12px;
+        border-radius: 6px;
+        list-style-type: none;
+        margin: 8px 0 0 0;
+        padding-left: 12px;
+        font-size: 0.9em;
+    }
+</style>
+
 {% endblock %}

@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .forms import PublicacionForm
-from .models import Articulo, Deseo
+from .models import Articulo, Deseo, Categoria # <-- ASEGÚRATE DE AÑADIR CATEGORIA AQUÍ
 # Create your views here.
 
 
@@ -72,6 +72,7 @@ def crear_publicacion(request):
                 descripcion=form.cleaned_data['descripcion']
             )
             # 2. Asigna las categorías seleccionadas al artículo
+            # USA 'categorias_ofrecidas' DEL FORMULARIO NUEVO
             articulo_nuevo.categorias.set(form.cleaned_data['categorias_ofrecidas'])
 
             # 3. Crea el Deseo asociado
@@ -79,6 +80,7 @@ def crear_publicacion(request):
                 articulo_ofrecido=articulo_nuevo
             )
             # 4. Asigna las categorías seleccionadas al deseo
+            # USA 'categorias_buscadas' DEL FORMULARIO NUEVO
             deseo_nuevo.categorias_buscadas.set(form.cleaned_data['categorias_buscadas'])
             
             return redirect('index') # O a donde quieras
@@ -112,11 +114,17 @@ def editar_publicacion(request, articulo_id):
             return redirect('index') # Redirige al inicio
     else:
         # GET: Muestra el formulario con los datos existentes
+        # (NOTA: Esta lógica de 'initial' se romperá con HTMX.
+        # Deberías cargar los datos iniciales de forma similar a como lo haces en
+        # crear_publicacion.html, pero con los valores seleccionados.
+        # Por simplicidad, lo dejamos así, pero la edición de la categoría
+        # requerirá una lógica JS o HTMX más avanzada para cargar los padres
+        # y luego los hijos seleccionados).
         datos_iniciales = {
             'titulo': articulo.titulo,
             'descripcion': articulo.descripcion,
-            'categorias_ofrecidas': articulo.categorias.all(),
-            'categorias_buscadas': deseo.categorias_buscadas.all()
+            # 'categorias_ofrecidas': articulo.categorias.all(), # Esto no funcionará bien
+            # 'categorias_buscadas': deseo.categorias_buscadas.all() # Esto no funcionará bien
         }
         form = PublicacionForm(initial=datos_iniciales)
 
@@ -138,3 +146,28 @@ def eliminar_publicacion(request, articulo_id):
     
     # GET: Muestra la página de confirmación
     return render(request, 'eliminar_publicacion.html', {'articulo': articulo})
+
+
+# --- ¡NUEVA VISTA PARA HTMX! ---
+@login_required # Opcional, pero recomendado si solo usuarios logueados publican
+def load_subcategorias(request):
+    """
+    Vista para cargar las subcategorías basadas en la categoría padre seleccionada.
+    """
+    padre_id = request.GET.get('padre_id')
+    
+    # El 'field_name' nos dirá si estamos pidiendo 'categorias_ofrecidas' o 'categorias_buscadas'
+    # para nombrar correctamente los checkboxes en el partial.
+    field_name = request.GET.get('field_name', 'categorias_ofrecidas') 
+    
+    try:
+        # Obtenemos las subcategorías que dependen del ID padre
+        subcategorias = Categoria.objects.filter(padre_id=int(padre_id)).order_by('nombre')
+    except (ValueError, TypeError):
+        subcategorias = Categoria.objects.none()
+
+    # Renderizamos un "partial" template (un fragmento de HTML)
+    return render(request, 'partials/subcategorias_checkboxes.html', {
+        'subcategorias': subcategorias,
+        'field_name': field_name
+    })

@@ -14,4 +14,5 @@ urlpatterns = [
     path('signin/', views.signin, name='signin'),
     path('signout/', views.signout, name='signout'),
     path('signup/', views.signup, name='signup'),
+    path('ajax/load-subcategorias/', views.load_subcategorias, name='ajax_load_subcategorias'),
 ]
