@@ -4,7 +4,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .forms import PublicacionForm
-from .models import Articulo, Deseo, Categoria # <-- ASEGÚRATE DE AÑADIR CATEGORIA AQUÍ
+from .models import Articulo, Deseo, Categoria # <-- Asegúrate que Categoria esté importada
 # Create your views here.
 
 
@@ -114,17 +114,9 @@ def editar_publicacion(request, articulo_id):
             return redirect('index') # Redirige al inicio
     else:
         # GET: Muestra el formulario con los datos existentes
-        # (NOTA: Esta lógica de 'initial' se romperá con HTMX.
-        # Deberías cargar los datos iniciales de forma similar a como lo haces en
-        # crear_publicacion.html, pero con los valores seleccionados.
-        # Por simplicidad, lo dejamos así, pero la edición de la categoría
-        # requerirá una lógica JS o HTMX más avanzada para cargar los padres
-        # y luego los hijos seleccionados).
         datos_iniciales = {
             'titulo': articulo.titulo,
             'descripcion': articulo.descripcion,
-            # 'categorias_ofrecidas': articulo.categorias.all(), # Esto no funcionará bien
-            # 'categorias_buscadas': deseo.categorias_buscadas.all() # Esto no funcionará bien
         }
         form = PublicacionForm(initial=datos_iniciales)
 
@@ -149,12 +141,15 @@ def eliminar_publicacion(request, articulo_id):
 
 
 # --- ¡NUEVA VISTA PARA HTMX! ---
-@login_required # Opcional, pero recomendado si solo usuarios logueados publican
+@login_required 
 def load_subcategorias(request):
     """
     Vista para cargar las subcategorías basadas en la categoría padre seleccionada.
     """
-    padre_id = request.GET.get('padre_id')
+    
+    # --- ¡ESTA ES LA LÍNEA CORREGIDA! ---
+    # Busca el ID del padre usando los nombres del formulario
+    padre_id = request.GET.get('categoria_padre') or request.GET.get('categoria_buscada_padre')
     
     # El 'field_name' nos dirá si estamos pidiendo 'categorias_ofrecidas' o 'categorias_buscadas'
     # para nombrar correctamente los checkboxes en el partial.
