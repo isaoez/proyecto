@@ -10,44 +10,60 @@
     <h2>Últimas Publicaciones</h2>
     
     {% for articulo in articulos %}
-        <article class="card" style="margin-bottom: 25px;">
-            {% if articulo.imagen %}
-                <img src="{{ articulo.imagen.url }}" alt="{{ articulo.titulo }}" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px 8px 0 0; margin: -30px -30px 20px -30px;">
-            {% endif %}
-            <h3>{{ articulo.titulo }}</h3>
-            
-            <p style="font-size: 0.9em; color: var(--color-text-secondary);">
-                Publicado por: <b>{{ articulo.propietario.username }}</b>
-            </p>
-            
-            <p>{{ articulo.descripcion }}</p>
-            
-            <div>
-                <strong>Busca:</strong>
+        <article class="card" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px;">
+
+            <div style="flex: 1; margin-right: 25px;"> 
                 
-                {% for categoria in articulo.propietario.deseo.categorias_buscadas.all %}
-                    <span style="background: #eee; padding: 3px 8px; border-radius: 12px; font-size: 0.9em;">
-                        {{ categoria }}
-                    </span>
-                {% empty %}
-                    <span style="font-style: italic; font-size: 0.9em;">(No especificó categorías)</span>
-                {% endfor %}
+                <h3>{{ articulo.titulo }}</h3>
+                
+                <p style="font-size: 0.9em; color: var(--color-text-secondary);">
+                    Publicado por: <b>{{ articulo.propietario.username }}</b>
+                </p>
+                
+                <p>{{ articulo.descripcion }}</p>
+                
+                <div>
+                    <strong>Busca:</strong>
+                    {% for categoria in articulo.propietario.deseo.categorias_buscadas.all %}
+                        <span style="background: #eee; padding: 3px 8px; border-radius: 12px; font-size: 0.9em;">
+                            {{ categoria }}
+                        </span>
+                    {% empty %}
+                        <span style="font-style: italic; font-size: 0.9em;">(No especificó categorías)</span>
+                    {% endfor %}
+                </div>
+
+                {% if user.is_authenticated and user == articulo.propietario %}
+                    <div style="border-top: 1px solid #eee; margin-top: 15px; padding-top: 15px;">
+                        <a href="{% url 'editar_publicacion' articulo.id %}" style="text-decoration: none; padding: 8px 12px; background: #007bff; color: white; border-radius: 5px; font-weight: 500;">
+                            Editar
+                        </a>
+                        <a href="{% url 'eliminar_publicacion' articulo.id %}" style="text-decoration: none; padding: 8px 12px; background: #dc3545; color: white; border-radius: 5px; font-weight: 500; margin-left: 10px;">
+                            Eliminar
+                        </a>
+                    </div>
+                {% endif %}
             </div>
 
-            {% if user.is_authenticated and user == articulo.propietario %}
-                <div style="border-top: 1px solid #eee; margin-top: 15px; padding-top: 15px;">
-                    <a href="{% url 'editar_publicacion' articulo.id %}" style="text-decoration: none; padding: 8px 12px; background: #007bff; color: white; border-radius: 5px; font-weight: 500;">
-                        Editar
-                    </a>
-                    <a href="{% url 'eliminar_publicacion' articulo.id %}" style="text-decoration: none; padding: 8px 12px; background: #dc3545; color: white; border-radius: 5px; font-weight: 500; margin-left: 10px;">
-                        Eliminar
-                    </a>
-                </div>
+            {% if articulo.imagen %}
+            <div style="flex-shrink: 0;"> <img src="{{ articulo.imagen.url }}" 
+                     alt="{{ articulo.titulo }}" 
+                     style="
+                        width: 150px;  /* Ancho del cuadrado */
+                        height: 150px; /* Alto del cuadrado */
+                        object-fit: cover; /* Asegura que la imagen llene el cuadrado */
+                        border: 3px solid var(--color-accent); /* Borde verde */
+                        border-radius: 8px; /* Bordes redondeados */
+                     ">
+            </div>
             {% endif %}
 
         </article>
-    {% endfor %}    
-    
+    {% empty %}
         <div class="card">
-            <p>Aún no hay publicaciones. ¡Sé el primero en <a href="{% url 'publicar' %}">publicar algo!
+            <p>Aún no hay publicaciones. ¡Sé el primero en <a href="{% url 'publicar' %}">publicar algo</a>!</p>
+        </div>
+    {% endfor %}
+</section>
+
 {% endblock %}
