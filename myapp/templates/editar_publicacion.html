@@ -5,8 +5,12 @@
     
     <h1>Editando: {{ articulo.titulo }}</h1>
     <p>Actualiza los datos de tu artículo y lo que buscas a cambio.</p>
+    {% if articulo.imagen %}
+        <p><b>Imagen actual:</b></p>
+        <img src="{{ articulo.imagen.url }}" alt="{{ articulo.titulo }}" style="max-width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px;">
+    {% endif %}
 
-    <form method="POST">
+    <form method="POST" enctype="multipart/form-data">
         {% csrf_token %}
         
         {{ form.as_p }} 

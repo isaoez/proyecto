@@ -9,7 +9,7 @@ class PublicacionForm(forms.Form):
     # --- CAMPOS (Solo los de Artículo) ---
     titulo = forms.CharField(label='Título de tu artículo', max_length=200)
     descripcion = forms.CharField(label='Descripción', widget=forms.Textarea)
-    
+    imagen = forms.ImageField(label='Imagen del artículo', required=False)
     categoria_padre = forms.ModelChoiceField(
         label='Género Principal (Ofrecido)',
         queryset=Categoria.objects.filter(padre=None).order_by('nombre'),

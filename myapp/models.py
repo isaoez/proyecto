@@ -22,6 +22,7 @@ class Articulo(models.Model):
     titulo = models.CharField(max_length=200)
     descripcion = models.TextField()
     propietario = models.ForeignKey(User, on_delete=models.CASCADE)
+    imagen = models.ImageField(upload_to='publicaciones/', null=True, blank=True)
     categorias = models.ManyToManyField(Categoria, related_name='articulos')
 
     def __str__(self):

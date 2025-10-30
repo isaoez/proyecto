@@ -62,14 +62,15 @@ def signout(request):
 @login_required
 def crear_publicacion(request):
     if request.method == 'POST':
-        form = PublicacionForm(request.POST)
+        form = PublicacionForm(request.POST, request.FILES) # Acepta archivos
         if form.is_valid():
             
             # 1. Crea el objeto Articulo
             articulo_nuevo = Articulo.objects.create(
                 propietario=request.user,
                 titulo=form.cleaned_data['titulo'],
-                descripcion=form.cleaned_data['descripcion']
+                descripcion=form.cleaned_data['descripcion'],
+                imagen=form.cleaned_data['imagen']
             )
             # 2. Asigna las categorías seleccionadas al artículo
             articulo_nuevo.categorias.set(form.cleaned_data['categorias_ofrecidas'])
@@ -92,12 +93,14 @@ def editar_publicacion(request, articulo_id):
         return HttpResponseForbidden("No tienes permiso para editar este artículo.")
 
     if request.method == 'POST':
-        form = PublicacionForm(request.POST) # El form ya no tiene campos de deseo
+        form = PublicacionForm(request.POST, request.FILES) # El form ya no tiene campos de deseo
         if form.is_valid():
             
             # 1. Actualiza el objeto Articulo
             articulo.titulo = form.cleaned_data['titulo']
             articulo.descripcion = form.cleaned_data['descripcion']
+            if form.cleaned_data['imagen']:
+                articulo.imagen = form.cleaned_data['imagen']
             articulo.categorias.set(form.cleaned_data['categorias_ofrecidas'])
             articulo.save()
 
