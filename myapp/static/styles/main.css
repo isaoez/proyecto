@@ -272,3 +272,41 @@ a:hover {
     background-color: var(--color-accent); /* Mantiene el fondo verde */
     color: #FFFFFF !important;             /* Mantiene el texto blanco */
 }
+/* --- ESTILOS PARA INPUT DE ARCHIVO (IMAGEN) --- */
+
+/* Contenedor */
+.input-file-wrapper {
+    margin-top: 5px;
+}
+
+/* Ocultamos el input de archivo original */
+.input-file-wrapper input[type="file"] {
+    display: none;
+}
+
+/* Estilo para el label (el botón falso) */
+.input-file-label {
+    background-color: #FFFFFF;
+    color: var(--color-accent);
+    border: 2px solid var(--color-accent);
+    padding: 10px 15px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 600;
+    display: inline-block; /* Importante */
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+/* Efecto hover para el botón falso */
+.input-file-label:hover {
+    background-color: var(--color-accent-hover);
+    color: #FFFFFF;
+    border-color: var(--color-accent-hover);
+}
+
+/* Estilo para el nombre del archivo (opcional) */
+.file-name-display {
+    margin-left: 10px;
+    font-style: italic;
+    color: var(--color-text-secondary);
+}

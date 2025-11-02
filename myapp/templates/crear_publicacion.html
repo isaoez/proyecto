@@ -56,7 +56,7 @@
             {% if form.categorias_ofrecidas.errors %}<div class="errorlist">{{ form.categorias_ofrecidas.errors }}</div>{% endif %}
         </p>
 
-        <button type="submit" style="margin-top: 20px;">
+        <button type="submit" class="btn" style="margin-top: 20px;">
             Publicar Artículo
         </button>
     </form>
@@ -106,5 +106,12 @@
         font-size: 0.9em;
     }
 </style>
+<script>
+document.getElementById("{{ form.imagen.id_for_label }}").addEventListener("change", function(e) {
+    var display = document.getElementById("file-name-display");
+    var fileName = e.target.files[0] ? e.target.files[0].name : "";
+    display.textContent = fileName;
+});
+</script>
 
 {% endblock %}
