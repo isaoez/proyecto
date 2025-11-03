@@ -23,9 +23,20 @@
             {{ form.descripcion }}
             {% if form.descripcion.errors %}<div class="errorlist">{{ form.descripcion.errors }}</div>{% endif %}
         </p>
+        
         <p>
             {{ form.imagen.label_tag }}
-            {{ form.imagen }}
+            <div class="input-file-wrapper">
+                {{ form.imagen }}
+                <label for="{{ form.imagen.id_for_label }}" class="input-file-label">
+                    Seleccionar Imagen
+                </label>
+                <span id="file-name-display" class="file-name-display"></span>
+            </div>
+            
+            <img id="image-preview" src="" alt="Previsualización de imagen" 
+                 style="display: none; width: 100%; max-width: 400px; height: auto; border-radius: 8px; margin-top: 15px; border: 1px solid var(--color-border-subtle);">
+            
             {% if form.imagen.errors %}<div class="errorlist">{{ form.imagen.errors }}</div>{% endif %}
         </p>
 
@@ -75,7 +86,7 @@
         font-size: 1em;
         color: var(--color-text-primary);
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        margin-top: 5px; /* Añadido para separar label de input */
+        margin-top: 5px;
     }
 
     form textarea {
@@ -85,7 +96,7 @@
 
     form label {
         display: block;
-        margin-bottom: 0; /* Ajustado */
+        margin-bottom: 0;
         font-weight: 600;
         color: var(--color-text-primary);
     }
@@ -106,11 +117,32 @@
         font-size: 0.9em;
     }
 </style>
+
 <script>
 document.getElementById("{{ form.imagen.id_for_label }}").addEventListener("change", function(e) {
     var display = document.getElementById("file-name-display");
-    var fileName = e.target.files[0] ? e.target.files[0].name : "";
-    display.textContent = fileName;
+    var preview = document.getElementById("image-preview"); // Obtenemos el <img>
+    var file = e.target.files[0];
+    
+    if (file) {
+        // 1. Mostrar nombre de archivo
+        display.textContent = file.name;
+
+        // 2. Mostrar previsualización de imagen
+        var reader = new FileReader();
+        
+        reader.onload = function(event) {
+            preview.src = event.target.result; // Poner la imagen en el 'src'
+            preview.style.display = "block";  // Hacerla visible
+        }
+        
+        reader.readAsDataURL(file); // Leer el archivo
+    } else {
+        // Si el usuario cancela, ocultar todo
+        display.textContent = "";
+        preview.src = "";
+        preview.style.display = "none";
+    }
 });
 </script>
 

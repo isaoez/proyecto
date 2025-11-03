@@ -8,10 +8,17 @@
 
     {% if articulo.imagen %}
         <p><b>Imagen actual:</b></p>
-        <img src="{{ articulo.imagen.url }}" alt="{{ articulo.titulo }}" style="max-width: 100%; height: auto; border-radius: 8px; margin-bottom: 15px;">
+        <img id="image-preview" src="{{ articulo.imagen.url }}" 
+             alt="{{ articulo.titulo }}" 
+             style="display: block; width: 100%; max-width: 400px; height: auto; border-radius: 8px; margin-bottom: 15px; border: 1px solid var(--color-border-subtle);">
+    {% else %}
+        <img id="image-preview" src="" alt="Previsualización de imagen" 
+             style="display: none; width: 100%; max-width: 400px; height: auto; border-radius: 8px; margin-top: 15px; border: 1px solid var(--color-border-subtle);">
     {% endif %}
 
-    <form method="POST" enctype="multipart/form-data"> {% csrf_token %}
+
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
         
         {% if form.non_field_errors %}
             <div class="errorlist">{{ form.non_field_errors }}</div>
@@ -39,6 +46,7 @@
             </div>
             {% if form.imagen.errors %}<div class="errorlist">{{ form.imagen.errors }}</div>{% endif %}
         </p>
+
         <hr style="margin: 25px 0; border-color: var(--color-border-subtle);">
 
         <p>
@@ -85,7 +93,7 @@
         font-size: 1em;
         color: var(--color-text-primary);
         transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        margin-top: 5px; /* Añadido para separar label de input */
+        margin-top: 5px;
     }
 
     form textarea {
@@ -95,7 +103,7 @@
 
     form label {
         display: block;
-        margin-bottom: 0; /* Ajustado */
+        margin-bottom: 0;
         font-weight: 600;
         color: var(--color-text-primary);
     }
@@ -120,8 +128,26 @@
 <script>
 document.getElementById("{{ form.imagen.id_for_label }}").addEventListener("change", function(e) {
     var display = document.getElementById("file-name-display");
-    var fileName = e.target.files[0] ? e.target.files[0].name : "";
-    display.textContent = fileName;
+    var preview = document.getElementById("image-preview"); // Obtenemos el <img>
+    var file = e.target.files[0];
+    
+    if (file) {
+        // 1. Mostrar nombre de archivo
+        display.textContent = file.name;
+
+        // 2. Mostrar previsualización de imagen
+        var reader = new FileReader();
+        
+        reader.onload = function(event) {
+            preview.src = event.target.result; // Poner la imagen en el 'src'
+            preview.style.display = "block";  // Hacerla visible
+        }
+        
+        reader.readAsDataURL(file); // Leer el archivo
+    } else {
+        // Si el usuario cancela, NO hacemos nada, dejamos la imagen actual
+        display.textContent = "";
+    }
 });
 </script>
 
