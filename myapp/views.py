@@ -164,14 +164,13 @@ def editar_preferencias(request):
     deseo, created = Deseo.objects.get_or_create(usuario=request.user)
 
     if request.method == 'POST':
-        form = PreferenciasForm(request.POST)
+        form = PreferenciasForm(request.POST) # Se lee el POST
         if form.is_valid():
             # 'set' reemplaza todas las categorías por las seleccionadas
             deseo.categorias_buscadas.set(form.cleaned_data['categorias_buscadas'])
             deseo.save()
             
-            # ¡AQUÍ ESTÁ TU SEGUNDO ARREGLO!
-            # Redirigimos de vuelta a 'perfil' como pediste.
+            # ¡ARREGLO DE REDIRECCIÓN!
             return redirect('perfil') 
     else:
         # GET: Mostramos el formulario con las preferencias actuales

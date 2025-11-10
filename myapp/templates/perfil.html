@@ -10,6 +10,7 @@
 
     <h3>Mis Preferencias de Búsqueda</h3>
     <p>Actualmente buscas artículos de estos géneros:</p>
+    
     <div>
         {% for categoria in user.deseo.categorias_buscadas.all %}
             <span style="background: #eee; padding: 3px 8px; border-radius: 12px; font-size: 0.9em; display: inline-block; margin: 3px;">
@@ -20,9 +21,12 @@
         {% endfor %}
     </div>
     
-    <a href="{% url 'editar_preferencias' %}" class="btn" style="max-width: 250px; margin-top: 30px;">
-        Editar mis Preferencias
-    </a>
+    <div style="margin-top: 25px;">
+        <a href="{% url 'editar_preferencias' %}" class="btn" style="max-width: 250px;">
+            Editar mis Preferencias
+        </a>
+    </div>
+
 </div>
 
 
