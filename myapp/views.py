@@ -160,7 +160,7 @@ def load_subcategorias(request):
 
 @login_required
 def editar_preferencias(request):
-    # Obtenemos el objeto Deseo del usuario
+    # Obtenemos el objeto Deseo del usuario (o lo creamos si no existe)
     deseo, created = Deseo.objects.get_or_create(usuario=request.user)
 
     if request.method == 'POST':
@@ -169,13 +169,21 @@ def editar_preferencias(request):
             # 'set' reemplaza todas las categorías por las seleccionadas
             deseo.categorias_buscadas.set(form.cleaned_data['categorias_buscadas'])
             deseo.save()
-            return redirect('editar_preferencias')
+            
+            # ¡AQUÍ ESTÁ TU SEGUNDO ARREGLO!
+            # Redirigimos de vuelta a 'perfil' como pediste.
+            return redirect('perfil') 
     else:
-        # --- Lógica de GET (mucho más simple) ---
-        # Solo le decimos al formulario qué categorías están 
-        # seleccionadas actualmente en el 'initial' data.
+        # GET: Mostramos el formulario con las preferencias actuales
         form = PreferenciasForm(initial={
             'categorias_buscadas': deseo.categorias_buscadas.all()
         })
 
     return render(request, 'editar_preferencias.html', {'form': form})
+@login_required
+def ver_perfil(request):
+    mis_articulos = Articulo.objects.filter(propietario=request.user).order_by('-id')
+    contexto = {
+        'mis_articulos': mis_articulos
+    }
+    return render(request, 'perfil.html', contexto)
