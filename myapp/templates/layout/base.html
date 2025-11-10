@@ -32,17 +32,17 @@
         </li>
         
         <li>
-            <a href="{% url 'signout' %}">Logout</a>
+            <a href="{% url 'signout' %}">Cerrar sesión</a>
         </li>
         
         {% else %}
         
         <li {% if request.resolver_match.url_name == 'signup' %}class="active"{% endif %}>
-            <a href="{% url 'signup' %}">Signup</a>
+            <a href="{% url 'signup' %}">Registrarse</a>
         </li>
         
         <li {% if request.resolver_match.url_name == 'signin' %}class="active"{% endif %}>
-            <a href="{% url 'signin' %}">Login</a>
+            <a href="{% url 'signin' %}">Ingresar</a>
         </li>
         {% endif %}
 
