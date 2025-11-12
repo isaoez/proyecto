@@ -5,12 +5,44 @@ from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .forms import PublicacionForm, PreferenciasForm
 from .models import Articulo, Deseo, Categoria 
+from django.db.models import Q
 # Create your views here.
 
 
 def index(request):
-    title = 'Página Principal'
-    articulos = Articulo.objects.all() 
+    title = 'Últimas Publicaciones'
+    
+    # --- LÓGICA DE MATCHMAKING ---
+    if request.user.is_authenticated:
+        try:
+            # 1. Obtenemos las categorías que el usuario desea
+            categorias_deseadas = request.user.deseo.categorias_buscadas.all()
+        except Deseo.DoesNotExist:
+            categorias_deseadas = Categoria.objects.none()
+
+        if categorias_deseadas.exists():
+            # 2. Buscamos artículos que:
+            #    - Pertenezcan a las categorías que el usuario desea (categorias__in)
+            #    - Y NO sean propiedad del usuario actual (exclude propietario)
+            articulos_filtrados = Articulo.objects.filter(
+                categorias__in=categorias_deseadas
+            ).exclude(
+                propietario=request.user
+            ).distinct() # .distinct() evita duplicados
+            
+            title = 'Coincidencias para ti'
+        else:
+            # 3. Si el usuario no tiene preferencias, mostramos todo (excepto lo suyo)
+            articulos_filtrados = Articulo.objects.exclude(propietario=request.user)
+            title = 'Todas las Publicaciones'
+            
+        articulos = articulos_filtrados.order_by('-id') # Mostramos los más nuevos primero
+
+    else:
+        # 4. Si el usuario no está logueado, mostramos todo
+        articulos = Articulo.objects.all().order_by('-id')
+    # --- FIN DE LA LÓGICA ---
+    
     return render(request, 'index.html', {
         'title': title,
         'articulos': articulos
@@ -186,3 +218,12 @@ def ver_perfil(request):
         'mis_articulos': mis_articulos
     }
     return render(request, 'perfil.html', contexto)
+
+@login_required
+def ver_mis_trueques(request):
+    # Buscamos todos los trueques sugeridos donde participa el usuario
+    trueques_sugeridos = request.user.trueques_sugeridos.filter(estado='SUGERIDO')
+
+    return render(request, 'mis_trueques.html', {
+        'trueques_sugeridos': trueques_sugeridos
+    })

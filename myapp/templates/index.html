@@ -7,8 +7,6 @@
 <h1>{{title}}</h1>
 
 <section>
-    <h2>Últimas Publicaciones</h2>
-    
     {% for articulo in articulos %}
         <article class="card" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px;">
 
@@ -21,9 +19,33 @@
                 </p>
                 
                 <p>{{ articulo.descripcion }}</p>
-                
+
+                <div style="margin-bottom: 10px;">
+                    <strong>Ofrece:</strong>
+                    {% for categoria in articulo.categorias.all %}
+                        <span style="background: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 3px 8px; border-radius: 12px; font-size: 0.9em;">
+                            {{ categoria }}
+                        </span>
+                    {% empty %}
+                        <span style="font-style: italic; font-size: 0.9em;">(Sin categoría)</span>
+                    {% endfor %}
+                </div>
+
+                {% if user.is_authenticated and user.deseo.categorias_buscadas.all %}
+                <div style="background: #e6f7ee; border: 1px solid var(--color-accent); padding: 10px; border-radius: 6px; margin-bottom: 15px;">
+                    <strong style="color: var(--color-accent-hover);">¡Coincidencia!</strong>
+                    <p style="margin-bottom: 0; color: #333; font-size: 0.9em;">
+                        Buscas artículos en: 
+                        {% for cat_deseada in user.deseo.categorias_buscadas.all %}
+                            {% if cat_deseada in articulo.categorias.all %}
+                                <span style="font-weight: bold;">{{ cat_deseada }}</span>{% if not forloop.last %}, {% endif %}
+                            {% endif %}
+                        {% endfor %}
+                    </p>
+                </div>
+                {% endif %}
                 <div>
-                    <strong>Busca:</strong>
+                    <strong>{{ articulo.propietario.username }} busca:</strong>
                     {% for categoria in articulo.propietario.deseo.categorias_buscadas.all %}
                         <span style="background: #eee; padding: 3px 8px; border-radius: 12px; font-size: 0.9em;">
                             {{ categoria }}
@@ -46,14 +68,15 @@
             </div>
 
             {% if articulo.imagen %}
-            <div style="flex-shrink: 0;"> <img src="{{ articulo.imagen.url }}" 
+            <div style="flex-shrink: 0;">
+                <img src="{{ articulo.imagen.url }}" 
                      alt="{{ articulo.titulo }}" 
                      style="
-                        width: 150px;  /* Ancho del cuadrado */
-                        height: 150px; /* Alto del cuadrado */
-                        object-fit: cover; /* Asegura que la imagen llene el cuadrado */
-                        border: 3px solid var(--color-accent); /* Borde verde */
-                        border-radius: 8px; /* Bordes redondeados */
+                        width: 150px;
+                        height: 150px;
+                        object-fit: cover;
+                        border: 3px solid var(--color-accent);
+                        border-radius: 8px;
                      ">
             </div>
             {% endif %}
@@ -61,7 +84,13 @@
         </article>
     {% empty %}
         <div class="card">
-            <p>Aún no hay publicaciones. ¡Sé el primero en <a href="{% url 'publicar' %}">publicar algo</a>!</p>
+            {% if user.is_authenticated and user.deseo.categorias_buscadas.all %}
+                <p>No se encontraron coincidencias para tus preferencias. ¡<a href="{% url 'editar_preferencias' %}">Actualiza tus preferencias</a> o espera nuevos artículos!</p>
+            {% elif user.is_authenticated %}
+                 <p>Actualmente no hay artículos de otros usuarios. ¡<a href="{% url 'publicar' %}">Publica algo</a>!</p>
+            {% else %}
+                <p>Aún no hay publicaciones. ¡<a href="{% url 'signup' %}">Regístrate</a> para unirte al trueque!</p>
+            {% endif %}
         </div>
     {% endfor %}
 </section>

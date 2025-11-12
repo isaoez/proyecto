@@ -51,3 +51,24 @@ def crear_o_actualizar_deseo_usuario(sender, instance, created, **kwargs):
         Deseo.objects.create(usuario=instance)
     # Para usuarios existentes, solo guarda el perfil (si ya existía)
     instance.deseo.save()
+    
+class TruequeSugerido(models.Model):
+    # Usamos ManyToManyField para listar a todos los que participan en el ciclo
+    participantes = models.ManyToManyField(User, related_name="trueques_sugeridos")
+    
+    # Estado para que todos los usuarios acepten
+    ESTADO_CHOICES = [
+        ('SUGERIDO', 'Sugerido'),
+        ('ACEPTADO', 'Aceptado por todos'),
+        ('RECHAZADO', 'Rechazado por alguien'),
+    ]
+    estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='SUGERIDO')
+    
+    # JSONField para guardar la cadena (Ej: "A ofrece X a B, B ofrece Y a C, ...")
+    # Es opcional pero muy útil para mostrarlo
+    detalles_cadena = models.JSONField(null=True, blank=True)
+    
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Trueque sugerido #{self.id} (Estado: {self.estado})"

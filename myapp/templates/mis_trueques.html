@@ -1,0 +1,52 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+
+<div class="card">
+    <h1>Mis Trueques Sugeridos</h1>
+</div>
+
+{% if trueques_sugeridos %}
+    
+    <div class="card" style="border-color: var(--color-accent);">
+        <p style="color: var(--color-accent-hover); margin-bottom: 0;">
+            <strong>¡Buenas noticias!</strong> Hemos encontrado las siguientes cadenas de intercambio en las que participas.
+        </p>
+    </div>
+
+    {% for trueque in trueques_sugeridos %}
+        <div class="card">
+            <h3>Cadena de Trueque #{{ trueque.id }}</h3>
+            <p>Este intercambio involucra a <strong>{{ trueque.participantes.count }} usuarios</strong>:</p>
+            
+            <ul>
+            {% for usuario in trueque.participantes.all %}
+                <li>
+                    <strong>{{ usuario.username }}</strong>
+                    {% if usuario == request.user %}(¡Tú!){% endif %}
+                </li>
+            {% endfor %}
+            </ul>
+            
+            <p style="font-style: italic;">
+                (Aquí iría la lógica para mostrar qué artículo va a quién, 
+                lo cual requiere que el algoritmo en el Paso 2 sea más detallado)
+            </p>
+            
+            <a href="#" class="btn" style="background-color: var(--color-accent);">Aceptar Trueque</a>
+            <a href="#" class="btn" style="background-color: #dc3545; margin-left: 10px;">Rechazar</a>
+        </div>
+    {% endfor %}
+
+{% else %}
+    
+    <div class="card">
+        <p>No se encontraron sugerencias de trueques para ti en este momento.</p>
+        <p>Asegúrate de tener tus <a href="{% url 'editar_preferencias' %}">preferencias actualizadas</a> y <a href="{% url 'publicar' %}">publicaciones activas</a>.</p>
+        <p style="font-size: 0.9em; color: var(--color-text-secondary); margin-top: 15px;">
+            (Recuerda que el sistema busca nuevas cadenas de trueque periódicamente).
+        </p>
+    </div>
+
+{% endif %}
+{% endblock %}

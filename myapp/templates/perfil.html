@@ -11,7 +11,7 @@
     <h3>Mis Preferencias de Búsqueda</h3>
     <p>Actualmente buscas artículos de estos géneros:</p>
     
-    <div>
+    <div style="margin-bottom: 20px;">
         {% for categoria in user.deseo.categorias_buscadas.all %}
             <span style="background: #eee; padding: 3px 8px; border-radius: 12px; font-size: 0.9em; display: inline-block; margin: 3px;">
                 {{ categoria }}
@@ -46,6 +46,16 @@
                 
                 <p>{{ articulo.descripcion }}</p>
                 
+                <div style="margin-bottom: 10px;">
+                    <strong>Ofrece:</strong>
+                    {% for categoria in articulo.categorias.all %}
+                        <span style="background: #d4edda; color: #155724; border: 1px solid #c3e6cb; padding: 3px 8px; border-radius: 12px; font-size: 0.9em;">
+                            {{ categoria }}
+                        </span>
+                    {% empty %}
+                        <span style="font-style: italic; font-size: 0.9em;">(Sin categoría)</span>
+                    {% endfor %}
+                </div>
                 <div>
                     <strong>Busca:</strong>
                     {% for categoria in articulo.propietario.deseo.categorias_buscadas.all %}
