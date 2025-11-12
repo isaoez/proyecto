@@ -119,39 +119,60 @@ def crear_publicacion(request):
 @login_required
 def editar_publicacion(request, articulo_id):
     articulo = get_object_or_404(Articulo, id=articulo_id)
-    # --- ¡Ya no necesitamos obtener el deseo! ---
 
     if articulo.propietario != request.user:
         return HttpResponseForbidden("No tienes permiso para editar este artículo.")
 
     if request.method == 'POST':
-        form = PublicacionForm(request.POST, request.FILES) # El form ya no tiene campos de deseo
+        # Al enviar datos, el formulario usa la lógica __init__ y clean que acabamos de arreglar
+        form = PublicacionForm(request.POST, request.FILES)
+        
         if form.is_valid():
             
             # 1. Actualiza el objeto Articulo
             articulo.titulo = form.cleaned_data['titulo']
             articulo.descripcion = form.cleaned_data['descripcion']
+            
             if form.cleaned_data['imagen']:
                 articulo.imagen = form.cleaned_data['imagen']
+            
+            # 2. ¡IMPORTANTE! Asignamos las categorías validadas por clean()
             articulo.categorias.set(form.cleaned_data['categorias_ofrecidas'])
             articulo.save()
-
-            # --- ¡LÓGICA DE ACTUALIZAR DESEO ELIMINADA! ---
             
-            return redirect('index')
+            return redirect('perfil') # Redirigimos al perfil
     else:
-        # GET: Muestra el formulario con los datos existentes
+        # --- LÓGICA GET (Cargar la página) ---
+        
+        # 1. Obtenemos la primera categoría guardada (o None)
+        categoria_actual = articulo.categorias.first()
+        
+        if categoria_actual:
+            # 2. Averiguamos si esta categoría es un "padre" o un "hijo"
+            if categoria_actual.padre is None:
+                # Es un padre (ej: "Libros")
+                padre = categoria_actual
+                subcategorias_marcadas = [] # Ninguna, porque el padre es la categoría final
+            else:
+                # Es un hijo (ej: "Rock")
+                padre = categoria_actual.padre
+                # Marcamos todos los "hermanos" que también estén guardados
+                subcategorias_marcadas = articulo.categorias.filter(padre=padre)
+        else:
+            # El artículo no tiene categoría
+            padre = None
+            subcategorias_marcadas = []
+
+        # 3. Pasamos los datos iniciales al formulario
         datos_iniciales = {
             'titulo': articulo.titulo,
             'descripcion': articulo.descripcion,
-            # NOTA: Poblar los campos de categoría HTMX en la edición
-            # requiere lógica adicional, pero el formulario base funcionará.
+            'categoria_padre': padre,
+            'categorias_ofrecidas': subcategorias_marcadas
         }
         form = PublicacionForm(initial=datos_iniciales)
 
-    # Renderiza la plantilla de edición
     return render(request, 'editar_publicacion.html', {'form': form, 'articulo': articulo})
-
 
 @login_required
 def eliminar_publicacion(request, articulo_id):
