@@ -3,8 +3,8 @@ from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .forms import PublicacionForm, PreferenciasForm
-from .models import Articulo, Deseo, Categoria 
+from .forms import PublicacionForm, PreferenciasForm, OfertaForm
+from .models import Articulo, Deseo, Categoria, Oferta
 from django.db.models import Q
 # Create your views here.
 
@@ -247,4 +247,42 @@ def ver_mis_trueques(request):
 
     return render(request, 'mis_trueques.html', {
         'trueques_sugeridos': trueques_sugeridos
+    })
+@login_required
+def hacer_oferta(request, articulo_id):
+    articulo_deseado = get_object_or_404(Articulo, id=articulo_id)
+    
+    # Seguridad: No puedes ofertar por tus propios artículos
+    if articulo_deseado.propietario == request.user:
+        # (Aquí podríamos añadir un mensaje de error, pero por ahora redirigimos)
+        return redirect('index') 
+
+    if request.method == 'POST':
+        form = OfertaForm(request.POST, usuario=request.user)
+        if form.is_valid():
+            oferta = form.save(commit=False)
+            oferta.ofertante = request.user
+            oferta.articulo_deseado = articulo_deseado
+            oferta.save()
+            return redirect('index') # Redirigimos al inicio tras ofertar
+    else:
+        # Pasamos el usuario al formulario para filtrar sus artículos
+        form = OfertaForm(usuario=request.user)
+
+    return render(request, 'hacer_oferta.html', {
+        'form': form,
+        'articulo_deseado': articulo_deseado
+    })
+
+@login_required
+def ver_ofertas_recibidas(request):
+    # Buscamos ofertas donde el artículo deseado pertenece al usuario logueado
+    # y que aún estén PENDIENTES
+    ofertas = Oferta.objects.filter(
+        articulo_deseado__propietario=request.user,
+        estado='PENDIENTE'
+    ).order_by('-fecha_creacion')
+    
+    return render(request, 'ofertas_recibidas.html', {
+        'ofertas_recibidas': ofertas
     })

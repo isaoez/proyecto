@@ -51,7 +51,7 @@ def crear_o_actualizar_deseo_usuario(sender, instance, created, **kwargs):
         Deseo.objects.create(usuario=instance)
     # Para usuarios existentes, solo guarda el perfil (si ya existía)
     instance.deseo.save()
-    
+
 class TruequeSugerido(models.Model):
     # Usamos ManyToManyField para listar a todos los que participan en el ciclo
     participantes = models.ManyToManyField(User, related_name="trueques_sugeridos")
@@ -72,3 +72,24 @@ class TruequeSugerido(models.Model):
 
     def __str__(self):
         return f"Trueque sugerido #{self.id} (Estado: {self.estado})"
+    
+class Oferta(models.Model):
+    # El usuario que hace la oferta
+    ofertante = models.ForeignKey(User, on_delete=models.CASCADE, related_name="ofertas_hechas")
+    
+    # El artículo que el ofertante quiere
+    articulo_deseado = models.ForeignKey(Articulo, on_delete=models.CASCADE, related_name="ofertas_recibidas")
+    
+    # El artículo que el ofertante ofrece a cambio
+    articulo_ofrecido = models.ForeignKey(Articulo, on_delete=models.CASCADE, related_name="ofertas_enviadas")
+    
+    ESTADO_CHOICES = [
+        ('PENDIENTE', 'Pendiente'),
+        ('ACEPTADA', 'Aceptada'),
+        ('RECHAZADA', 'Rechazada'),
+    ]
+    estado = models.CharField(max_length=10, choices=ESTADO_CHOICES, default='PENDIENTE')
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Oferta de {self.ofertante.username} por {self.articulo_deseado.titulo}"

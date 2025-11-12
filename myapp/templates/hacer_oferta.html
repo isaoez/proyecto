@@ -1,0 +1,56 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h1>Hacer una Oferta</h1>
+    <p>Estás a punto de hacer una oferta por el artículo:</p>
+
+    <article class="card" style="background: #f4f4f4;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="flex: 1; margin-right: 25px;">
+                <h3>{{ articulo_deseado.titulo }}</h3>
+                <p>Propietario: <strong>{{ articulo_deseado.propietario.username }}</strong></p>
+                <p>{{ articulo_deseado.descripcion }}</p>
+            </div>
+            {% if articulo_deseado.imagen %}
+            <div style="flex-shrink: 0;">
+                <img src="{{ articulo_deseado.imagen.url }}" alt="{{ articulo_deseado.titulo }}" 
+                     style="width: 100px; height: 100px; object-fit: cover; border-radius: 8px;">
+            </div>
+            {% endif %}
+        </div>
+    </article>
+
+    <hr style="margin: 25px 0;">
+
+    <form method="POST">
+        {% csrf_token %}
+        
+        <p>
+            {{ form.articulo_ofrecido.label_tag }}
+            {{ form.articulo_ofrecido }}
+            {% if form.articulo_ofrecido.errors %}<div class="errorlist">{{ form.articulo_ofrecido.errors }}</div>{% endif %}
+        </p>
+
+        <button type="submit" class="btn" style="margin-top: 20px;">
+            Enviar Oferta
+        </button>
+    </form>
+</div>
+
+<style>
+    .form-control {
+        width: 100%;
+        padding: 12px 15px;
+        background: var(--color-input-bg);
+        border: 1px solid var(--color-input-border);
+        border-radius: 6px;
+        box-sizing: border-box;
+        font-size: 1em;
+        color: var(--color-text-primary);
+        margin-top: 5px;
+    }
+    form p { margin-bottom: 20px; }
+    form label { font-weight: 600; }
+</style>
+{% endblock %}

@@ -30,11 +30,13 @@
         <li {% if request.resolver_match.url_name == 'perfil' or request.resolver_match.url_name == 'editar_preferencias' %}class="active"{% endif %}>
             <a href="{% url 'perfil' %}">Mi Perfil</a>
         </li>
+        
         <li {% if request.resolver_match.url_name == 'mis_trueques' %}class="active"{% endif %}>
             <a href="{% url 'mis_trueques' %}">Mis Trueques</a>
         </li>
+        
         <li>
-            <a href="{% url 'signout' %}">Cerrar sesión</a>
+            <a href="{% url 'signout' %}">Salir</a>
         </li>
         
         {% else %}
