@@ -252,3 +252,13 @@ a:hover { color: var(--color-accent-hover); }
     font-style: italic;
     color: var(--color-text-secondary);
 }
+.badge-notif {
+    background-color: #dc3545; /* Rojo */
+    color: white;
+    font-size: 0.75em;
+    font-weight: 700;
+    padding: 3px 7px;
+    border-radius: 12px; /* Píldora */
+    margin-left: 6px;
+    vertical-align: middle; /* Lo alinea bien con el texto */
+}

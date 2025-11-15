@@ -15,26 +15,63 @@
     </div>
 
     {% for trueque in trueques_sugeridos %}
-        <div class="card">
+        <div class="card" style="border-left: 5px solid #ffc107;">
             <h3>Cadena de Trueque #{{ trueque.id }}</h3>
-            <p>Este intercambio involucra a <strong>{{ trueque.participantes.count }} usuarios</strong>:</p>
+            <p>Este intercambio involucra a <strong>{{ trueque.participantes.count }} usuarios</strong>.</p>
+            
+            <div style="margin-bottom: 15px;">
+                {% for transaccion in trueque.detalles_cadena %}
+                    <div style="border-bottom: 1px solid #eee; padding-bottom: 5px; margin-bottom: 5px;">
+                        <strong>{{ transaccion.de_usuario_nombre }}</strong> 
+                        entrega 
+                        <strong>"{{ transaccion.articulo_titulo }}"</strong>
+                        a 
+                        <strong>{{ transaccion.para_usuario_nombre }}</strong>
+                    </div>
+                {% empty %}
+                    <p>(Error al cargar detalles de la cadena)</p>
+                {% endfor %}
+            </div>
+            
+            <p style="font-style: italic;">
+                Estado: {{ trueque.usuarios_que_aceptaron.count }} de {{ trueque.participantes.count }} han aceptado.
+            </p>
             
             <ul>
             {% for usuario in trueque.participantes.all %}
                 <li>
                     <strong>{{ usuario.username }}</strong>
                     {% if usuario == request.user %}(¡Tú!){% endif %}
+                    {% if usuario in trueque.usuarios_que_aceptaron.all %}
+                        <span style="color: var(--color-accent); font-weight: bold;">(Aceptó)</span>
+                    {% else %}
+                        <span style="color: var(--color-text-secondary);">(Pendiente)</span>
+                    {% endif %}
                 </li>
             {% endfor %}
             </ul>
             
-            <p style="font-style: italic;">
-                (Aquí iría la lógica para mostrar qué artículo va a quién, 
-                lo cual requiere que el algoritmo en el Paso 2 sea más detallado)
-            </p>
-            
-            <a href="#" class="btn" style="background-color: var(--color-accent);">Aceptar Trueque</a>
-            <a href="#" class="btn" style="background-color: #dc3545; margin-left: 10px;">Rechazar</a>
+            {% if user not in trueque.usuarios_que_aceptaron.all %}
+                <div style="display: flex; gap: 10px; margin-top: 15px;">
+                    <form action="{% url 'aceptar_trueque_cadena' trueque.id %}" method="POST" style="margin: 0;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn" style="background-color: var(--color-accent); width: auto;">
+                            Aceptar Cadena
+                        </button>
+                    </form>
+                    <form action="{% url 'rechazar_trueque_cadena' trueque.id %}" method="POST" style="margin: 0;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn" style="background-color: #dc3545; width: auto;">
+                            Rechazar Cadena
+                        </button>
+                    </form>
+                </div>
+            {% else %}
+                <p style="color: var(--color-accent-hover); font-weight: bold; margin-top: 15px;">
+                    ¡Ya aceptaste! Esperando al resto de participantes...
+                </p>
+            {% endif %}
+
         </div>
     {% endfor %}
 

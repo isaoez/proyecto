@@ -55,7 +55,8 @@ def crear_o_actualizar_deseo_usuario(sender, instance, created, **kwargs):
 class TruequeSugerido(models.Model):
     # Usamos ManyToManyField para listar a todos los que participan en el ciclo
     participantes = models.ManyToManyField(User, related_name="trueques_sugeridos")
-    
+    # Guarda a los usuarios que ya han aceptado
+    usuarios_que_aceptaron = models.ManyToManyField(User, related_name="trueques_aceptados", blank=True)
     # Estado para que todos los usuarios acepten
     ESTADO_CHOICES = [
         ('SUGERIDO', 'Sugerido'),

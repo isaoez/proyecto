@@ -1,10 +1,12 @@
 from django.shortcuts import get_object_or_404, render, redirect
 from django.http import HttpResponse, JsonResponse, HttpResponseForbidden
+from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import login, logout, authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .forms import PublicacionForm, PreferenciasForm, OfertaForm
-from .models import Articulo, Deseo, Categoria, Oferta
+from .models import Articulo, Deseo, Categoria, Oferta, TruequeSugerido
+from django.db import transaction
 from django.db.models import Q
 # Create your views here.
 
@@ -242,12 +244,101 @@ def ver_perfil(request):
 
 @login_required
 def ver_mis_trueques(request):
-    # Buscamos todos los trueques sugeridos donde participa el usuario
     trueques_sugeridos = request.user.trueques_sugeridos.filter(estado='SUGERIDO')
+    
+    # --- Pre-procesamiento para la plantilla ---
+    # Para evitar lógica compleja (y errónea) en el template.
+    
+    # 1. Obtenemos todos los IDs de usuarios y artículos de todas las cadenas
+    user_ids = set()
+    articulo_ids = set()
+    for trueque in trueques_sugeridos:
+        if not trueque.detalles_cadena:
+            continue
+        for transaccion in trueque.detalles_cadena:
+            user_ids.add(transaccion.get("de_usuario_id"))
+            user_ids.add(transaccion.get("para_usuario_id"))
+            articulo_ids.add(transaccion.get("articulo_id"))
+    
+    # 2. Hacemos dos consultas a la BD, en lugar de miles
+    usuarios = {u.id: u.username for u in User.objects.filter(id__in=user_ids)}
+    articulos = {a.id: a.titulo for a in Articulo.objects.filter(id__in=articulo_ids)}
 
+    # 3. "Enriquecemos" los detalles con los nombres
+    for trueque in trueques_sugeridos:
+        if not trueque.detalles_cadena:
+            continue
+        for transaccion in trueque.detalles_cadena:
+            transaccion["de_usuario_nombre"] = usuarios.get(transaccion.get("de_usuario_id"), "Usuario Desconocido")
+            transaccion["para_usuario_nombre"] = usuarios.get(transaccion.get("para_usuario_id"), "Usuario Desconocido")
+            transaccion["articulo_titulo"] = articulos.get(transaccion.get("articulo_id"), "Artículo Desconocido")
+    
     return render(request, 'mis_trueques.html', {
         'trueques_sugeridos': trueques_sugeridos
     })
+@login_required
+@transaction.atomic # Asegura que si algo falla, toda la operación se deshace
+def aceptar_trueque_cadena(request, trueque_id):
+    if request.method == 'POST':
+        trueque = get_object_or_404(TruequeSugerido, id=trueque_id)
+        
+        # 1. Comprobamos que el usuario esté en este trueque y el trueque siga sugerido
+        if request.user in trueque.participantes.all() and trueque.estado == 'SUGERIDO':
+            
+            # 2. Añadimos al usuario a la lista de "aceptados"
+            trueque.usuarios_que_aceptaron.add(request.user)
+            
+            # 3. Comprobamos si ya todos aceptaron
+            total_participantes = trueque.participantes.count()
+            total_aceptados = trueque.usuarios_que_aceptaron.count()
+            
+            if total_aceptados == total_participantes:
+                # ¡Todos aceptaron! Procedemos al intercambio.
+                trueque.estado = 'ACEPTADO'
+                trueque.save()
+                
+                articulos_intercambiados_ids = []
+
+                # 4. Leemos el JSON y ejecutamos el trueque
+                if trueque.detalles_cadena:
+                    for transaccion in trueque.detalles_cadena:
+                        try:
+                            articulo = Articulo.objects.get(id=transaccion["articulo_id"])
+                            nuevo_propietario = User.objects.get(id=transaccion["para_usuario_id"])
+                            
+                            # Intercambiamos el propietario
+                            articulo.propietario = nuevo_propietario
+                            articulo.save()
+                            
+                            articulos_intercambiados_ids.append(articulo.id)
+                        except (Articulo.DoesNotExist, User.DoesNotExist):
+                            pass
+                
+                # 5. Limpieza: Rechazar otras ofertas y trueques
+                if articulos_intercambiados_ids:
+                    # Rechaza todas las ofertas 1-a-1 pendientes por estos artículos
+                    Oferta.objects.filter(
+                        (Q(articulo_deseado_id__in=articulos_intercambiados_ids) |
+                         Q(articulo_ofrecido_id__in=articulos_intercambiados_ids)) &
+                        Q(estado='PENDIENTE')
+                    ).update(estado='RECHAZADA')
+
+    return redirect('mis_trueques')
+
+
+@login_required
+def rechazar_trueque_cadena(request, trueque_id):
+    if request.method == 'POST':
+        trueque = get_object_or_404(TruequeSugerido, id=trueque_id)
+        
+        # 1. Comprobamos que el usuario esté en este trueque
+        if request.user in trueque.participantes.all():
+            
+            # 2. Si un usuario rechaza, toda la cadena se cancela.
+            trueque.estado = 'RECHAZADO'
+            trueque.save()
+            
+    return redirect('mis_trueques')
 @login_required
 def hacer_oferta(request, articulo_id):
     articulo_deseado = get_object_or_404(Articulo, id=articulo_id)

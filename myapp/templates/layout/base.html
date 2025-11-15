@@ -3,7 +3,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="UTF-R">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Django proyect</title>
     <link rel="stylesheet" href="{% static 'styles/main.css' %}">
@@ -22,12 +22,18 @@
             {% if user.is_authenticated %}
                 <a href="{% url 'ver_ofertas_recibidas' %}" {% if request.resolver_match.url_name == 'ver_ofertas_recibidas' %}class="active"{% endif %}>
                     Ofertas Recibidas
+                    {% if ofertas_pendientes_count > 0 %}
+                        <span class="badge-notif">{{ ofertas_pendientes_count }}</span>
+                    {% endif %}
                 </a>
                 <a href="{% url 'ofertas_enviadas' %}" {% if request.resolver_match.url_name == 'ofertas_enviadas' %}class="active"{% endif %}>
                     Ofertas Enviadas
                 </a>
                 <a href="{% url 'mis_trueques' %}" {% if request.resolver_match.url_name == 'mis_trueques' %}class="active"{% endif %}>
                     Mis Trueques
+                    {% if trueques_pendientes_count > 0 %}
+                        <span class="badge-notif">{{ trueques_pendientes_count }}</span>
+                    {% endif %}
                 </a>
             {% endif %}
         </div>
