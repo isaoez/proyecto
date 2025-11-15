@@ -276,13 +276,93 @@ def hacer_oferta(request, articulo_id):
 
 @login_required
 def ver_ofertas_recibidas(request):
-    # Buscamos ofertas donde el artículo deseado pertenece al usuario logueado
-    # y que aún estén PENDIENTES
-    ofertas = Oferta.objects.filter(
-        articulo_deseado__propietario=request.user,
-        estado='PENDIENTE'
+    # 1. Buscamos TODAS las ofertas donde nuestros artículos fueron deseados
+    todas_mis_ofertas = Oferta.objects.filter(
+        articulo_deseado__propietario=request.user
     ).order_by('-fecha_creacion')
+
+    # 2. Las separamos por estado
+    ofertas_pendientes = todas_mis_ofertas.filter(estado='PENDIENTE')
+    ofertas_aceptadas = todas_mis_ofertas.filter(estado='ACEPTADA')
+    ofertas_rechazadas = todas_mis_ofertas.filter(estado='RECHAZADA')
     
     return render(request, 'ofertas_recibidas.html', {
-        'ofertas_recibidas': ofertas
+        'ofertas_pendientes': ofertas_pendientes,
+        'ofertas_aceptadas': ofertas_aceptadas,
+        'ofertas_rechazadas': ofertas_rechazadas,
+    })
+@login_required
+def aceptar_oferta(request, oferta_id):
+    # Usamos POST para seguridad, ya que esto modifica datos
+    if request.method == 'POST':
+        oferta = get_object_or_404(Oferta, id=oferta_id)
+        
+        # --- Comprobación de Seguridad ---
+        # ¿Es el usuario actual el dueño del artículo que se está pidiendo?
+        if oferta.articulo_deseado.propietario != request.user:
+            return HttpResponseForbidden("No tienes permiso para aceptar esta oferta.")
+
+        # --- 1. Lógica del Trueque ---
+        articulo_deseado = oferta.articulo_deseado
+        articulo_ofrecido = oferta.articulo_ofrecido
+        
+        # Guardamos a los propietarios originales
+        propietario_deseado = articulo_deseado.propietario # (Tú, el User B)
+        propietario_ofrecido = articulo_ofrecido.propietario # (El User A)
+
+        # Intercambiamos los propietarios
+        articulo_deseado.propietario = propietario_ofrecido
+        articulo_ofrecido.propietario = propietario_deseado
+        
+        # Guardamos los artículos con sus nuevos dueños
+        articulo_deseado.save()
+        articulo_ofrecido.save()
+        
+        # --- 2. Actualizar el Estado de la Oferta ---
+        oferta.estado = 'ACEPTADA'
+        oferta.save()
+        
+        # --- 3. Limpieza: Rechazar otras ofertas pendientes ---
+        # Rechaza todas las demás ofertas PENDIENTES por el artículo que acabas de recibir
+        Oferta.objects.filter(articulo_deseado=articulo_ofrecido, estado='PENDIENTE').update(estado='RECHAZADA')
+        # Rechaza todas las demás ofertas PENDIENTES por el artículo que acabas de entregar
+        Oferta.objects.filter(articulo_deseado=articulo_deseado, estado='PENDIENTE').update(estado='RECHAZADA')
+        # Rechaza todas las demás ofertas PENDIENTES que el User A hizo con el artículo que te dio
+        Oferta.objects.filter(articulo_ofrecido=articulo_ofrecido, estado='PENDIENTE').update(estado='RECHAZADA')
+
+    # Redirigir de vuelta a la página de ofertas
+    return redirect('ver_ofertas_recibidas')
+
+
+@login_required
+def rechazar_oferta(request, oferta_id):
+    # Usamos POST para seguridad
+    if request.method == 'POST':
+        oferta = get_object_or_404(Oferta, id=oferta_id)
+        
+        # --- Comprobación de Seguridad ---
+        if oferta.articulo_deseado.propietario != request.user:
+            return HttpResponseForbidden("No tienes permiso para rechazar esta oferta.")
+            
+        # Simplemente cambiamos el estado
+        oferta.estado = 'RECHAZADA'
+        oferta.save()
+
+    return redirect('ver_ofertas_recibidas')
+@login_required
+def ver_ofertas_enviadas(request):
+    # Buscamos todas las ofertas hechas por el usuario actual
+    todas_mis_ofertas = Oferta.objects.filter(
+        ofertante=request.user
+    ).order_by('-fecha_creacion')
+
+    # Las separamos por estado
+    ofertas_pendientes = todas_mis_ofertas.filter(estado='PENDIENTE')
+    ofertas_aceptadas = todas_mis_ofertas.filter(estado='ACEPTADA')
+    ofertas_rechazadas = todas_mis_ofertas.filter(estado='RECHAZADA')
+    
+    return render(request, 'ofertas_enviadas.html', {
+        'ofertas_pendientes': ofertas_pendientes,
+        'ofertas_aceptadas': ofertas_aceptadas,
+        'ofertas_rechazadas': ofertas_rechazadas,
     })

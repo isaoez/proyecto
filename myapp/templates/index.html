@@ -7,6 +7,7 @@
 <h1>{{title}}</h1>
 
 <section>
+    
     {% for articulo in articulos %}
         <article class="card" style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 25px;">
 
@@ -44,6 +45,7 @@
                     </p>
                 </div>
                 {% endif %}
+                
                 <div>
                     <strong>{{ articulo.propietario.username }} busca:</strong>
                     {% for categoria in articulo.propietario.deseo.categorias_buscadas.all %}
@@ -55,17 +57,27 @@
                     {% endfor %}
                 </div>
 
-                {% if user.is_authenticated and user == articulo.propietario %}
+                {% if user.is_authenticated %}
                     <div style="border-top: 1px solid #eee; margin-top: 15px; padding-top: 15px;">
-                        <a href="{% url 'editar_publicacion' articulo.id %}" style="text-decoration: none; padding: 8px 12px; background: #007bff; color: white; border-radius: 5px; font-weight: 500;">
-                            Editar
-                        </a>
-                        <a href="{% url 'eliminar_publicacion' articulo.id %}" style="text-decoration: none; padding: 8px 12px; background: #dc3545; color: white; border-radius: 5px; font-weight: 500; margin-left: 10px;">
-                            Eliminar
-                        </a>
+                        
+                        {% if user == articulo.propietario %}
+                            <a href="{% url 'editar_publicacion' articulo.id %}" style="text-decoration: none; padding: 8px 12px; background: #007bff; color: white; border-radius: 5px; font-weight: 500;">
+                                Editar
+                            </a>
+                            <a href="{% url 'eliminar_publicacion' articulo.id %}" style="text-decoration: none; padding: 8px 12px; background: #dc3545; color: white; border-radius: 5px; font-weight: 500; margin-left: 10px;">
+                                Eliminar
+                            </a>
+                        {% else %}
+                            <a href="{% url 'hacer_oferta' articulo.id %}" 
+                               class="btn" 
+                               style="background-color: var(--color-accent); width: auto; font-size: 0.9em; padding: 8px 12px;">
+                                Hacer Oferta
+                            </a>
+                        {% endif %}
+                        
                     </div>
                 {% endif %}
-            </div>
+                </div>
 
             {% if articulo.imagen %}
             <div style="flex-shrink: 0;">
@@ -85,7 +97,7 @@
     {% empty %}
         <div class="card">
             {% if user.is_authenticated and user.deseo.categorias_buscadas.all %}
-                <p>No se encontraron coincidencias para tus preferencias. ¡<a href="{% url 'editar_preferencias' %}">Actualiza tus preferencias</a> o espera nuevos artículos!</p>
+                <p>No se encontraron coincidencias para tus preferencias. ¡<a href="{% url 'editar_preferencias' %}">Actualiza tus búsquedas</a> o espera nuevos artículos!</p>
             {% elif user.is_authenticated %}
                  <p>Actualmente no hay artículos de otros usuarios. ¡<a href="{% url 'publicar' %}">Publica algo</a>!</p>
             {% else %}

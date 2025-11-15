@@ -1,22 +1,19 @@
 /* --- PALETA DE COLORES (Verde y Blanco) --- */
 :root {
-    --color-bg: #F8F9FA;          /* Fondo principal (Gris muy claro) */
-    --color-navbar-bg: #FFFFFF;   /* Fondo de Navbar (Blanco) */
-    --color-card-bg: #FFFFFF;     /* Fondo de Tarjetas (Blanco) */
-    --color-text-primary: #212529; /* Texto principal (Casi negro) */
-    --color-text-secondary: #6C757D; /* Texto secundario (Gris) */
-    
-    --color-accent: #28a745;       /* Acento principal (Verde) */
-    --color-accent-hover: #218838;   /* Acento hover (Verde oscuro) */
-    --color-btn-hover: #218838;    /* Botón hover (Verde oscuro) */
-    
-    --color-input-bg: #FFFFFF;    /* Fondo de inputs */
-    --color-input-border: #CED4DA;  /* Borde de inputs */
-    --color-border-subtle: #DEE2E6; /* Borde suave para cards/navbar */
-    
-    --color-error: #721C24;         /* Texto de error (Rojo oscuro) */
-    --color-error-bg: #F8D7DA;     /* Fondo para errores (Rojo claro) */
-    --color-error-border: #F5C6CB; /* Borde para errores */
+    --color-bg: #F8F9FA;
+    --color-navbar-bg: #FFFFFF;
+    --color-card-bg: #FFFFFF;
+    --color-text-primary: #212529;
+    --color-text-secondary: #6C757D;
+    --color-accent: #28a745;
+    --color-accent-hover: #218838;
+    --color-btn-hover: #218838;
+    --color-input-bg: #FFFFFF;
+    --color-input-border: #CED4DA;
+    --color-border-subtle: #DEE2E6;
+    --color-error: #721C24;
+    --color-error-bg: #F8D7DA;
+    --color-error-border: #F5C6CB;
 }
 
 /* --- ESTILOS GLOBALES --- */
@@ -27,64 +24,97 @@ body {
     margin: 0;
     padding: 0;
 }
+h1, h2, h3, h4, h5 { color: var(--color-text-primary); }
+p { color: var(--color-text-secondary); line-height: 1.6; }
+a { color: var(--color-accent); text-decoration: none; transition: color 0.2s ease-in-out; }
+a:hover { color: var(--color-accent-hover); }
 
-h1, h2, h3, h4, h5 {
-    color: var(--color-text-primary);
-}
-
-p {
-    color: var(--color-text-secondary);
-    line-height: 1.6;
-}
-
-a {
-    color: var(--color-accent);
-    text-decoration: none;
-    transition: color 0.2s ease-in-out;
-}
-
-a:hover {
-    color: var(--color-accent-hover);
-}
-
-/* --- BARRA DE NAVEGACIÓN --- */
+/* --- BARRA DE NAVEGACIÓN (¡CORREGIDA!) --- */
 .navbar {
     background: var(--color-navbar-bg);
-    padding: 15px 30px;
+    padding: 10px 30px; /* Padding vertical más pequeño */
     border-bottom: 1px solid var(--color-border-subtle);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Sombra suave */
-}
-
-.navbar ul {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    
+    /* ¡AQUÍ LA MAGIA! Usamos Flexbox para las 3 columnas */
     display: flex;
-    justify-content: space-between;
+    justify-content: space-between; /* Empuja izq y der a los bordes */
     align-items: center;
-    list-style: none;
-    margin: 0;
-    padding: 0;
+    min-height: 40px; /* Altura mínima */
 }
 
-.navbar ul li a {
+/* Grupo Izquierdo: Crece lo necesario */
+.nav-left {
+    display: flex;
+    justify-content: flex-start;
+}
+
+/* Grupo Central: No crece, se queda al medio */
+.nav-center {
+    display: flex;
+    justify-content: center;
+}
+
+/* Grupo Derecho: Crece lo necesario */
+.nav-right {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Estilo para TODOS los enlaces de la barra */
+.nav-left a,
+.nav-right a {
     color: var(--color-text-primary);
     text-decoration: none;
     font-weight: 500;
     padding: 8px 12px;
     border-radius: 4px;
     transition: background-color 0.2s ease, color 0.2s ease;
+    white-space: nowrap; /* Evita que el texto se parta */
+    margin: 0 5px; /* Pequeño espacio entre enlaces */
 }
 
-.navbar ul li a:hover {
+/* Hover para enlaces normales */
+.nav-left a:hover,
+.nav-right a:hover {
     background-color: var(--color-bg);
     color: var(--color-accent-hover);
 }
 
-/* Estilo especial para el botón "Publicar" */
-.navbar ul li a b {
-    color: var(--color-accent);
+/* Estilo para el botón "Publicar" */
+.nav-center .btn-publicar {
+    background-color: var(--color-accent);
+    color: #FFFFFF !important;
+    font-weight: 700;
+    padding: 10px 20px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+    white-space: nowrap;
+}
+.nav-center .btn-publicar:hover {
+    background-color: var(--color-accent-hover);
+    color: #FFFFFF !important;
+}
+.nav-center .btn-publicar b {
+    color: #FFFFFF;
 }
 
-.navbar ul li a:hover b {
-    color: var(--color-accent-hover);
+/* Estilo 'active' para enlaces normales */
+.nav-left a.active,
+.nav-right a.active {
+    background-color: var(--color-accent);
+    color: #FFFFFF !important;
+    font-weight: 700;
+}
+.nav-left a.active:hover,
+.nav-right a.active:hover {
+    background-color: var(--color-accent);
+    color: #FFFFFF !important;
+}
+
+/* Estilo 'active' para el botón Publicar */
+.nav-center .btn-publicar.active-publicar {
+    background-color: var(--color-accent-hover);
 }
 
 
@@ -103,23 +133,17 @@ a:hover {
     margin-bottom: 25px;
     border-radius: 8px;
     border: 1px solid var(--color-border-subtle);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05); /* Sombra muy suave */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 /* --- FORMULARIOS (Inputs, botones, labels) --- */
-
-.card form p {
-    margin-bottom: 20px;
-}
-
+.card form p { margin-bottom: 20px; }
 .card form label {
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
     color: var(--color-text-primary);
 }
-
-/* Inputs de texto, email, contraseña */
 .card form input[type="text"],
 .card form input[type="password"],
 .card form input[type="email"],
@@ -129,33 +153,24 @@ a:hover {
     background: var(--color-input-bg);
     border: 1px solid var(--color-input-border);
     border-radius: 6px;
-    box-sizing: border-box; /* Importante */
+    box-sizing: border-box;
     font-size: 1em;
     color: var(--color-text-primary);
     transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
-
 .card form textarea {
     min-height: 120px;
     resize: vertical;
 }
-
-/* Foco en los inputs */
 .card form input[type="text"]:focus,
 .card form input[type="password"]:focus,
 .card form input[type="email"]:focus,
 .card form textarea:focus {
     outline: none;
     border-color: var(--color-accent);
-    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.25); /* Sombra de foco verde */
+    box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.25);
 }
-
-/* Checkboxes */
-.card form input[type="checkbox"] {
-    margin-right: 10px;
-}
-
-/* Contenedor para checkboxes (para el form de publicación) */
+.card form input[type="checkbox"] { margin-right: 10px; }
 .card form div[id^="div_id_categorias"] ul {
     list-style-type: none;
     padding-left: 0;
@@ -167,20 +182,13 @@ a:hover {
     border-radius: 6px;
     padding: 10px;
 }
-.card form div[id^="div_id_categorias"] li {
-    padding: 5px;
-}
-
-
-/* Textos de ayuda de Django */
+.card form div[id^="div_id_categorias"] li { padding: 5px; }
 .card form .helptext {
     font-size: 0.9em;
     color: var(--color-text-secondary);
     display: block;
     margin-top: 8px;
 }
-
-/* Lista de errores del formulario */
 .card form .errorlist {
     color: var(--color-error);
     background: var(--color-error-bg);
@@ -195,7 +203,7 @@ a:hover {
 /* --- BOTÓN PRINCIPAL (.btn) --- */
 .btn {
     background-color: var(--color-accent);
-    color: #FFFFFF; /* Texto blanco en el botón verde */
+    color: #FFFFFF;
     padding: 12px 20px;
     border: none;
     border-radius: 6px;
@@ -206,10 +214,9 @@ a:hover {
     margin-top: 10px;
     transition: background-color 0.2s ease, transform 0.1s ease;
 }
-
 .btn:hover {
     background-color: var(--color-btn-hover);
-    transform: translateY(-1px); /* Efecto sutil al pasar el ratón */
+    transform: translateY(-1px);
 }
 
 /* --- ENLACES PIE DE FORMULARIO --- */
@@ -217,74 +224,13 @@ a:hover {
     text-align: center;
     margin-top: 25px;
 }
+.form-footer-link p { margin: 0; color: var(--color-text-secondary); }
+.form-footer-link a { color: var(--color-accent); font-weight: 600; }
+.form-footer-link a:hover { color: var(--color-accent-hover); text-decoration: underline; }
 
-.form-footer-link p {
-    margin: 0;
-    color: var(--color-text-secondary);
-}
-
-.form-footer-link a {
-    color: var(--color-accent);
-    font-weight: 600;
-}
-
-.form-footer-link a:hover {
-    color: var(--color-accent-hover);
-    text-decoration: underline;
-}
-
-/* --- CLASES MISCELÁNEAS (de tu CSS original) --- */
-.input {
-    background: var(--color-input-bg);
-    padding: 10px;
-    text-align: center;
-    display: block;
-}
-
-.link-button {
-    background: none;
-    border: none;
-    color: var(--color-accent);
-    text-decoration: underline;
-    cursor: pointer;
-    padding: 0;
-    font: inherit;
-}
-
-.link-button:hover {
-    color: var(--color-accent-hover);
-}
-
-/* --- ¡NUEVO! ESTILO PARA EL ENLACE ACTIVO EN NAVBAR --- */
-.navbar ul li.active a {
-    background-color: var(--color-accent); /* Fondo verde */
-    color: #FFFFFF !important;             /* Texto blanco */
-    font-weight: 700;                  /* Un poco más grueso */
-}
-
-/* Opcional: Para mantener el color del icono '+' en Publicar */
-.navbar ul li.active a b {
-    color: #FFFFFF; /* Blanco, para que coincida */
-}
-
-/* Evitar que el hover cambie el estilo del activo */
-.navbar ul li.active a:hover {
-    background-color: var(--color-accent); /* Mantiene el fondo verde */
-    color: #FFFFFF !important;             /* Mantiene el texto blanco */
-}
 /* --- ESTILOS PARA INPUT DE ARCHIVO (IMAGEN) --- */
-
-/* Contenedor */
-.input-file-wrapper {
-    margin-top: 5px;
-}
-
-/* Ocultamos el input de archivo original */
-.input-file-wrapper input[type="file"] {
-    display: none;
-}
-
-/* Estilo para el label (el botón falso) */
+.input-file-wrapper { margin-top: 5px; }
+.input-file-wrapper input[type="file"] { display: none; }
 .input-file-label {
     background-color: #FFFFFF;
     color: var(--color-accent);
@@ -293,18 +239,14 @@ a:hover {
     border-radius: 6px;
     cursor: pointer;
     font-weight: 600;
-    display: inline-block; /* Importante */
+    display: inline-block;
     transition: background-color 0.2s ease, color 0.2s ease;
 }
-
-/* Efecto hover para el botón falso */
 .input-file-label:hover {
     background-color: var(--color-accent-hover);
     color: #FFFFFF;
     border-color: var(--color-accent-hover);
 }
-
-/* Estilo para el nombre del archivo (opcional) */
 .file-name-display {
     margin-left: 10px;
     font-style: italic;

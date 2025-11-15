@@ -11,51 +11,58 @@
     <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
 </head>
 <body>
+    
     <nav class="navbar">
-    <ul>
-        <li {% if request.resolver_match.url_name == 'index' %}class="active"{% endif %}>
-            <a href="/">Inicio</a>
-        </li>
-        
-        <li {% if request.resolver_match.url_name == 'about' %}class="active"{% endif %}>
-            <a href="{% url 'about' %}">About</a>
-        </li>
+
+        <div class="nav-left">
+            <a href="/" {% if request.resolver_match.url_name == 'index' %}class="active"{% endif %}>
+                Inicio
+            </a>
+            
+            {% if user.is_authenticated %}
+                <a href="{% url 'ver_ofertas_recibidas' %}" {% if request.resolver_match.url_name == 'ver_ofertas_recibidas' %}class="active"{% endif %}>
+                    Ofertas Recibidas
+                </a>
+                <a href="{% url 'ofertas_enviadas' %}" {% if request.resolver_match.url_name == 'ofertas_enviadas' %}class="active"{% endif %}>
+                    Ofertas Enviadas
+                </a>
+                <a href="{% url 'mis_trueques' %}" {% if request.resolver_match.url_name == 'mis_trueques' %}class="active"{% endif %}>
+                    Mis Trueques
+                </a>
+            {% endif %}
+        </div>
 
         {% if user.is_authenticated %}
-        
-        <li {% if request.resolver_match.url_name == 'publicar' %}class="active"{% endif %}>
-            <a href="{% url 'publicar' %}"><b>+ Publicar</b></a>
-        </li>
-        
-        <li {% if request.resolver_match.url_name == 'perfil' or request.resolver_match.url_name == 'editar_preferencias' %}class="active"{% endif %}>
-            <a href="{% url 'perfil' %}">Mi Perfil</a>
-        </li>
-        
-        <li {% if request.resolver_match.url_name == 'mis_trueques' %}class="active"{% endif %}>
-            <a href="{% url 'mis_trueques' %}">Mis Trueques</a>
-        </li>
-        
-        <li>
-            <a href="{% url 'signout' %}">Salir</a>
-        </li>
-        
-        {% else %}
-        
-        <li {% if request.resolver_match.url_name == 'signup' %}class="active"{% endif %}>
-            <a href="{% url 'signup' %}">Registrarse</a>
-        </li>
-        
-        <li {% if request.resolver_match.url_name == 'signin' %}class="active"{% endif %}>
-            <a href="{% url 'signin' %}">Ingresar</a>
-        </li>
+        <div class="nav-center">
+            <a href="{% url 'publicar' %}" 
+               class="btn-publicar {% if request.resolver_match.url_name == 'publicar' %}active-publicar{% endif %}">
+                <b>+ Publicar</b>
+            </a>
+        </div>
         {% endif %}
 
-    </ul>
-</nav>
+        <div class="nav-right">
+            {% if user.is_authenticated %}
+                <a href="{% url 'perfil' %}" {% if request.resolver_match.url_name == 'perfil' or request.resolver_match.url_name == 'editar_preferencias' %}class="active"{% endif %}>
+                    Mi Perfil
+                </a>
+                <a href="{% url 'signout' %}">Salir</a>
+            
+            {% else %}
+                <a href="{% url 'signup' %}" {% if request.resolver_match.url_name == 'signup' %}class="active"{% endif %}>
+                    Registrarse
+                </a>
+                <a href="{% url 'signin' %}" {% if request.resolver_match.url_name == 'signin' %}class="active"{% endif %}>
+                    Ingresar
+                </a>
+            {% endif %}
+        </div>
+        
+    </nav>
 
-<main class="container">
-    {% block content %}
-    {% endblock %}
-</main>
+    <main class="container">
+        {% block content %}
+        {% endblock %}
+    </main>
 </body>
 </html>

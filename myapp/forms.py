@@ -1,9 +1,9 @@
 # myapp/forms.py
 from django import forms
-# ¡CAMBIO AQUÍ! Añadimos Articulo y Oferta
+# ¡CAMBIO! Añadimos Articulo y Oferta
 from .models import Categoria, Articulo, Oferta 
 
-# --- FORMULARIO 1: PARA CREAR PUBLICACIONES (Corregido) ---
+# --- FORMULARIO 1: PARA CREAR PUBLICACIONES (CORREGIDO) ---
 
 class PublicacionForm(forms.Form):
     
@@ -15,7 +15,8 @@ class PublicacionForm(forms.Form):
     categoria_padre = forms.ModelChoiceField(
         label='Género Principal (Ofrecido)',
         queryset=Categoria.objects.filter(padre=None).order_by('nombre'),
-        required=True, # Lo hacemos requerido
+        # ¡CAMBIO! Lo hacemos requerido
+        required=True, 
         empty_label="Selecciona una categoría principal"
     )
     categorias_ofrecidas = forms.ModelMultipleChoiceField(
@@ -25,11 +26,12 @@ class PublicacionForm(forms.Form):
         widget=forms.CheckboxSelectMultiple
     )
     
-    # --- ¡VERSIÓN CORREGIDA DEL __init__! ---
+    # --- ¡MÉTODO __init__ CORREGIDO! ---
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
         data = None
+        # Comprobamos si estamos en un POST (con datos) o GET (con initial)
         if 'data' in args:
             data = args[0]
         elif 'data' in kwargs:
@@ -61,15 +63,18 @@ class PublicacionForm(forms.Form):
         padre = cleaned_data.get('categoria_padre')
 
         if not padre:
+            # El campo ya es 'required', así que Django lo validará primero
             return cleaned_data 
 
         if not categorias_seleccionadas:
             # Caso 1: Se seleccionó un padre (ej: "Libros") Y este NO tiene hijos.
             if padre.subcategorias.exists() == False:
+                # ¡Correcto! El usuario quiere seleccionar "Libros".
                 cleaned_data['categorias_ofrecidas'] = [padre]
             
             # Caso 2: Se seleccionó un padre (ej: "Música") Y este SÍ tiene hijos.
             else:
+                # ... pero no se seleccionó ningún hijo (ej: "Rock"). Es un error.
                 self.add_error('categorias_ofrecidas', 'Debes seleccionar al menos una subcategoría para la categoría padre elegida.')
         
         elif padre and categorias_seleccionadas:
@@ -92,7 +97,7 @@ class PreferenciasForm(forms.Form):
     )
 
 
-# --- ¡NUEVO FORMULARIO DE OFERTA AÑADIDO! ---
+# --- ¡AQUÍ ESTÁ EL FORMULARIO QUE FALTABA! ---
 class OfertaForm(forms.ModelForm):
     class Meta:
         model = Oferta

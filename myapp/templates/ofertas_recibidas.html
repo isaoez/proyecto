@@ -3,10 +3,13 @@
 {% block content %}
 <div class="card">
     <h1>Ofertas Recibidas</h1>
-    <p>Estos son los trueques que otros usuarios te han propuesto por tus artículos. (Aún no puedes aceptarlas/rechazarlas).</p>
+    <p>Aquí puedes administrar las ofertas que otros usuarios te han propuesto por tus artículos.</p>
 </div>
 
-{% for oferta in ofertas_recibidas %}
+<h2 style="margin-top: 30px;">🛎️ Ofertas Pendientes</h2>
+<hr>
+
+{% for oferta in ofertas_pendientes %}
     <div class="card" style="border-left: 5px solid var(--color-accent);">
         <p>
             El usuario <strong>{{ oferta.ofertante.username }}</strong> te ofrece:
@@ -23,12 +26,58 @@
             <h4>{{ oferta.articulo_deseado.titulo }}</h4>
         </div>
         
-        <a href="#" class="btn" style="background-color: var(--color-accent); pointer-events: none; opacity: 0.7;">Aceptar (Próximamente)</a>
-        <a href="#" class="btn" style="background-color: #dc3545; margin-left: 10px; pointer-events: none; opacity: 0.7;">Rechazar (Próximamente)</a>
+        <div style="display: flex; gap: 10px;">
+            <form action="{% url 'aceptar_oferta' oferta.id %}" method="POST" style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit" class="btn" style="background-color: var(--color-accent); width: auto;">
+                    Aceptar
+                </button>
+            </form>
+            <form action="{% url 'rechazar_oferta' oferta.id %}" method="POST" style="margin: 0;">
+                {% csrf_token %}
+                <button type="submit" class="btn" style="background-color: #dc3545; width: auto;">
+                    Rechazar
+                </button>
+            </form>
+        </div>
     </div>
 {% empty %}
     <div class="card">
         <p>No tienes ninguna oferta pendiente.</p>
+    </div>
+{% endfor %}
+
+
+<h2 style="margin-top: 30px;">✅ Ofertas Aceptadas</h2>
+<hr>
+{% for oferta in ofertas_aceptadas %}
+    <div class="card" style="border-left: 5px solid #28a745; background-color: #f8f9fa;">
+        <p>El <strong>{{ oferta.fecha_creacion|date:"d/m/Y" }}</strong> aceptaste la oferta de <strong>{{ oferta.ofertante.username }}</strong>.</p>
+        <p style="margin-bottom: 0;">
+           <strong>Entregaste:</strong> {{ oferta.articulo_deseado.titulo }}<br>
+           <strong>Recibiste:</strong> {{ oferta.articulo_ofrecido.titulo }}
+        </p>
+    </div>
+{% empty %}
+    <div class="card">
+        <p>No tienes ofertas aceptadas.</p>
+    </div>
+{% endfor %}
+
+
+<h2 style="margin-top: 30px;">❌ Ofertas Rechazadas</h2>
+<hr>
+{% for oferta in ofertas_rechazadas %}
+    <div class="card" style="border-left: 5px solid #dc3545; background-color: #f8f9fa;">
+        <p>Rechazaste la oferta de <strong>{{ oferta.ofertante.username }}</strong>.</p>
+        <p style="margin-bottom: 0;">
+           <strong>Ofrecía:</strong> {{ oferta.articulo_ofrecido.titulo }}<br>
+           <strong>A cambio de:</strong> {{ oferta.articulo_deseado.titulo }}
+        </p>
+    </div>
+{% empty %}
+    <div class="card">
+        <p>No tienes ofertas rechazadas.</p>
     </div>
 {% endfor %}
 

@@ -1,0 +1,64 @@
+{% extends 'layout/base.html' %}
+
+{% block content %}
+<div class="card">
+    <h1>Mis Ofertas Enviadas</h1>
+    <p>Este es el historial de las ofertas que has enviado a otros usuarios.</p>
+</div>
+
+<h2 style="margin-top: 30px;">⌛ Pendientes</h2>
+<hr>
+{% for oferta in ofertas_pendientes %}
+    <div class="card" style="border-left: 5px solid #ffc107;">
+        <p>El <strong>{{ oferta.fecha_creacion|date:"d/m/Y" }}</strong> ofreciste tu artículo:</p>
+        <div style="background: #e6f7ee; padding: 15px; border-radius: 8px; margin-bottom: 15px;">
+            <h4>{{ oferta.articulo_ofrecido.titulo }}</h4>
+        </div>
+        
+        <p style="text-align: center; font-weight: bold;">A cambio del artículo:</p>
+        
+        <div style="background: #f4f4f4; padding: 15px; border-radius: 8px; margin-bottom: 10px;">
+            <h4>{{ oferta.articulo_deseado.titulo }}</h4>
+            <p style="margin-bottom: 0; font-size: 0.9em;">(Propietario: {{ oferta.articulo_deseado.propietario.username }})</p>
+        </div>
+        <p style="font-style: italic; text-align: center;">Esperando respuesta...</p>
+    </div>
+{% empty %}
+    <div class="card">
+        <p>No tienes ninguna oferta enviada pendiente.</p>
+    </div>
+{% endfor %}
+
+<h2 style="margin-top: 30px;">✅ Aceptadas</h2>
+<hr>
+{% for oferta in ofertas_aceptadas %}
+    <div class="card" style="border-left: 5px solid #28a745; background-color: #f8f9fa;">
+        <p>¡Buenas noticias! El <strong>{{ oferta.fecha_creacion|date:"d/m/Y" }}</strong>, el usuario <strong>{{ oferta.articulo_deseado.propietario.username }}</strong> aceptó tu oferta.</p>
+        <p style="margin-bottom: 0;">
+           <strong>Entregaste:</strong> {{ oferta.articulo_ofrecido.titulo }}<br>
+           <strong>Recibiste:</strong> {{ oferta.articulo_deseado.titulo }}
+        </p>
+    </div>
+{% empty %}
+    <div class="card">
+        <p>Ninguna de tus ofertas ha sido aceptada.</p>
+    </div>
+{% endfor %}
+
+<h2 style="margin-top: 30px;">❌ Rechazadas</h2>
+<hr>
+{% for oferta in ofertas_rechazadas %}
+    <div class="card" style="border-left: 5px solid #dc3545; background-color: #f8f9fa;">
+        <p>El <strong>{{ oferta.fecha_creacion|date:"d/m/Y" }}</strong>, el usuario <strong>{{ oferta.articulo_deseado.propietario.username }}</strong> rechazó tu oferta.</p>
+        <p style="margin-bottom: 0;">
+           <strong>Ofreciste:</strong> {{ oferta.articulo_ofrecido.titulo }}<br>
+           <strong>A cambio de:</strong> {{ oferta.articulo_deseado.titulo }}
+        </p>
+    </div>
+{% empty %}
+    <div class="card">
+        <p>No tienes ofertas rechazadas.</p>
+    </div>
+{% endfor %}
+
+{% endblock %}
